@@ -1,6 +1,3 @@
 *.class
-./indexCranfield/.*
-./indexData/.*
 ./data/.*
 ./cranfield/.*
-./cranfieldSeparated/.*
