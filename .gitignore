@@ -1,6 +1,17 @@
+# Ignore compiled Java classes
 *.class
-./indexCranfield/.*
-./indexData/.*
-./data/.*
-./cranfield/.*
-./cranfieldSeparated/.*
+
+# Ignore contents of these directories but keep the directories
+indexCranfield/*
+indexData/*
+data/*
+cranfield/*
+cranfieldSeparated/*
+
+# Add .gitkeep to track empty directories
+!indexCranfield/.gitkeep
+!indexData/.gitkeep
+!data/.gitkeep
+!cranfield/.gitkeep
+!cranfieldSeparated/.gitkeep
+
