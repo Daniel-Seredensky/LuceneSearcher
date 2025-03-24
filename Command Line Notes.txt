@@ -1,4 +1,0 @@
-When compiling the code, use the following command:
-javac -cp "jars/*:." FinalProjMain.java
-To run the code, use the following command:
-java -cp "jars/*:." FinalProjMain

@@ -226,7 +226,6 @@ public class TextFileIndexer {
         StringBuilder contentBuilder = new StringBuilder();
         String author = "";
         String title = "";
-        boolean titleFound = false;
         boolean inGutenbergBlock = false;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -236,17 +235,16 @@ public class TextFileIndexer {
                 if (line.contains("Author:") && author.isEmpty()) {
                     author = line.substring(line.indexOf("Author:") + "Author:".length()).trim();
                 }
-                if (!titleFound && line.contains("Title:")) {
+                if (title.isEmpty() && line.contains("Title:")) {
                     title = line.substring(line.indexOf("Title:") + "Title:".length()).trim();
-                    titleFound = true;
                 }
                 // If Gutenberg extraction is enabled, collect only the text between the markers.
                 if (isGutenberg) {
-                    if (line.contains("*** START OF THE PROJECT GUTENBERG EBOOK")) {
+                    if (line.contains("START OF THE PROJECT GUTENBERG EBOOK")) {
                         inGutenbergBlock = true;
                         continue;
                     }
-                    if (line.contains("*** END OF THE PROJECT GUTENBERG EBOOK")) {
+                    if (line.contains("END OF THE PROJECT GUTENBERG EBOOK")) {
                         inGutenbergBlock = false;
                         break; // End of content block.
                     }

@@ -52,7 +52,7 @@ public class CranfieldCleaner {
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         } else {
-            // Delete all files in the output directory because we want to start fresh.
+            // Delete all files in the output directory because if clean is called assume we want to start fresh.
             for (File file : outputDir.listFiles()) {
                 file.delete();
             }
@@ -161,7 +161,6 @@ public class CranfieldCleaner {
         String cleanTitle = title.replaceAll("\\s+", " ").trim();
         File outFile = new File(outputDir, fileName + ".txt");
         try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
-            // For example, write the title on the first line, author on the second, and content thereafter.
             out.println(cleanTitle);
             out.println(author);
             out.println(content);
