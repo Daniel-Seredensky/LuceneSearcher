@@ -63,6 +63,11 @@ public class LuceneSearcher {
         }
     }
 
+    /**
+     * Opens the index and initializes the searcher.
+     *
+     * @throws IOException If an error occurs during closing.
+     */
     public void open() throws IOException {
         this.indexDirectory = FSDirectory.open(Paths.get(this.indexDirPath));
         this.indexReader = DirectoryReader.open(indexDirectory);
@@ -78,4 +83,9 @@ public class LuceneSearcher {
     public IndexSearcher getIndexSearcher() {
         return searcher;
     }
+
+    public DirectoryReader getIndexReader() {
+        return indexReader;
+    }
+    
 }

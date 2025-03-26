@@ -22,7 +22,7 @@ import java.util.Arrays;
  * If the initial query (isFirstQuery=true) returns no results, the caller may reinitialize the
  * parser with isFirstQuery=false to generate a more lenient query.
  * </p>
- *
+ * 
  * @version March 2025
  * @author Daniel Seredensky
  */

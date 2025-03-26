@@ -1,54 +1,83 @@
 # Names: Daniel Seredensky, Oliwia Majtyka, Ojo
 
-*cranfield* directory contains the Cranfield data set<p>
-*data* directory contains the Project Gutenberg files.  They are numbered pgxxx.txt and pgxxxx.txt.<p>
-*jars* directory contains the Lucene 8.8.2 jar files<p>
-*indexData* directory contains the indexed data <p>
-*indexCranfield* directory contains the indexed cranfield data <p>
-*cranfieldSeparated* directory contains the cranfield data separated into individual files<p>
+## Directory Description
+- *cranfield* directory contains the Cranfield data set
+- *data* directory contains the Project Gutenberg files.  They are numbered pgxxx.txt and pgxxxx.txt.
+- *jars* directory contains the Lucene 8.8.2 jar files
+- *indexData* directory contains the indexed data 
+- *indexCranfield* directory contains the indexed cranfield data 
+- *cranfieldSeparated* directory contains the cranfield data separated into individual files
 
 # How to run
 
 ## Compilation 
 
-***note*** I use zsh for my terminal
+- ***note*** I use zsh for my terminal
 
 ``` zsh
-javac -cp "jars/*:." *.java  
+# compiles the java files in the main dir, and the GUI files 
+javac -cp "jars/*:." *.java GUI/*.java GUI/*/*.java
 ```
 
 ## Run 
 
 ### **KWARGS**
 - ***explain*** boolean flag for the lucene explanation to be shown in the result (no value needed)
-- ***text*** boolean flag for the CLI to be shown instead of the GUI (no value needed) **GUI not implemented**
+- ***text*** boolean flag for the CLI to be shown instead of the GUI (no value needed) [**GUI not implemented**]
 - ***index*** String for the specific index directory to be used
 - ***data***  String for the specific data directory to be used
-- ***parallel*** boolean flag for the indexing and search parseing to be run in parallel (no value needed) **not implemented**
+- ***parallel*** boolean flag for the indexing and search parseing to be run in parallel (no value needed) [**not implemented**]
+- ***new*** boolean flag to only index new documents
+- ***changed*** boolean flag to only index changed documents
+- ***missing*** boolean flag to only index missing documents
 
 ``` zsh
 java -cp "jars/*:." FinalProjMain -kwarg1 value1 -kwarg2 value2
+# test the GUI
+java -cp "jars/*:." GUI/ComponentTest.java
 ```
 
 # Search Logic 
 
-``` plainttext
+``` plaintext
 +---------------------+
 |    SearchManager    |  <-- Coordinates overall search logic
 +---------------------+
-           |
+           |  First calls the QueryManager
            v
 +---------------------+     +---------------------+
 |    QueryManager     | <-- |    MyQueryParser    |  <-- Custom parser that creates field-specific queries
 +---------------------+     +---------------------+
-           |
+           |  After Query is build it is passed to the LuceneSearcher
            v
 +---------------------+
-|      Searcher       |  <-- Executes the Lucene Query (using IndexSearcher)
+|   LuceneSearcher    |  <-- Executes the search using the built query from Query Manger (using search(query))
 +---------------------+
-           |
+           | Results object created by Results.fromTopDoc(topDocs)
            v
 +---------------------+
-| ResultsFormatter    |  <-- Extracts and formats key fields and best-match fragments
+|      Results        |  <-- Extracts and formats key fields and best-match fragments 
 +---------------------+
+```
+
+# GUI
+
+``` plaintext
+GUI/
+├── GUI.java                // Main JFrame (**not implemented**)
+├── backend/
+│   └── AllenIverson.java   // Coordinates search operations and file I/O (**not implemented**)
+├── components/
+│   ├── SearchBar.java        // Custom search bar component 
+│   ├── SearchButton.java        // Search button component
+│   ├── CustomTextField.java     // Text field with custom styling to blend into the JPanel (SearchBar.java)
+│   ├── ModernButton.java        // Button designed to look like a SwiftUI rounded button
+│   ├── Menu.java        // Settings menu (**not implemented**)
+│   └── ResultsComponent.java    // Displays search results in a scrollable panel (**not implemented**)
+│   GUIProgression/
+│       └── BaseGUI.java // Base abstract class for main JFrame handles setup
+├── jars/                // External libraries 
+│   └── flatlaf.jar
+│   └── **Lucene jars**
+├── **Rest of files**
 ```

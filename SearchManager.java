@@ -51,6 +51,13 @@ public class SearchManager {
         this.luceneSearcher.setIndexDirPath(indexDirPath);
         this.luceneSearcher.setMaxResults(maxResults);
         this.isLenientQuery = false;
+        try {
+            luceneSearcher.open();
+        } catch (IOException e) {
+            System.out.println("Error opening index directory: " + indexDirPath);
+            e.printStackTrace();
+
+        }
     }
 
     // Setters for instance variables.
@@ -95,6 +102,11 @@ public class SearchManager {
                 e.printStackTrace();
             }
         }
+        try {
+            luceneSearcher.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         scanner.close();
     }
 
@@ -124,7 +136,6 @@ public class SearchManager {
             return isLenientQuery ? "Wild card search mode enabled for non analyzed fields." : "Wild card search mode disabled.";
         }
 
-        luceneSearcher.open();
         queryManager.setQueryMode(!isLenientQuery);
         queryManager.setSearchQuery(searchQuery);
         queryManager.process();
@@ -136,7 +147,9 @@ public class SearchManager {
         }
         // Retrieve the built Lucene Query.
         Query query = queryManager.getBuiltQuery();
-        
+        System.out.println("Your Constructed Lucene Query: " + query.rewrite(luceneSearcher.getIndexReader()).toString());
+        System.out.println(""); // new line because it looks better
+
         // Get the set of requested fields (either detected from fielded syntax or default to all fields).
         Set<String> requestedFields = queryManager.findRequestedFields();
 
@@ -146,7 +159,6 @@ public class SearchManager {
         // Process the TopDocs and build a formatted results output.
         Results resultsOutput = Results.fromTopDocs(luceneSearcher.getIndexSearcher(), query, topDocs, queryManager.getPerFieldAnalyzer(), requestedFields, explain);
         
-        luceneSearcher.close();
         return resultsOutput.getTotalHits() != 0 ? resultsOutput.toString() : "No results found.";
     }
 }
