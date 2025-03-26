@@ -67,6 +67,8 @@ GUI/
 ├── GUI.java                // Main JFrame (**not implemented**)
 ├── backend/
 │   └── AllenIverson.java   // Coordinates search operations and file I/O (**not implemented**)
+│   Utilities/             // Utility classes for GUI
+│       └── ScalingUtil.java // Utility class for scaling components to get a basic version of Swifts dynamic geometry
 ├── components/
 │   ├── SearchBar.java        // Custom search bar component 
 │   ├── SearchButton.java        // Search button component
