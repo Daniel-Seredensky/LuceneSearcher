@@ -1,6 +1,11 @@
 # Ignore compiled Java classes
 *.class
 
+# MacOS metadata
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+
 # Ignore contents of these directories but keep the directories
 indexCranfield/*
 indexData/*
