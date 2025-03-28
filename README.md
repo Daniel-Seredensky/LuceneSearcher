@@ -1,4 +1,4 @@
-# Names: Daniel Seredensky, Oliwia Majtyka, Ojo
+# Names: Daniel, Oliwia, Ojo, William 
 
 ## Directory Description
 - *cranfield* directory contains the Cranfield data set
@@ -64,21 +64,23 @@ java -cp "jars/*:." GUI/ComponentTest.java
 
 ``` plaintext
 GUI/
-├── GUI.java                // Main JFrame (**not implemented**)
-├── backend/
-│   └── AllenIverson.java   // Coordinates search operations and file I/O (**not implemented**)
-│   Utilities/             // Utility classes for GUI
-│       └── ScalingUtil.java // Utility class for scaling components to get a basic version of Swifts dynamic geometry
-├── components/
-│   ├── SearchBar.java        // Custom search bar component 
+├── GUI.java                     // Main JFrame (**not implemented**)
+├── backend/                     // Backend classes for GUI
+│   └── AllenIverson.java        // Coordinates search operations and file I/O (**not implemented**)
+│   Utilities/                   // Utility classes for GUI
+│       └── ScalingUtil.java     // Utility class for scaling components to get a basic version of Swifts dynamic geometry
+│       └── DrawingUtils.java    // Utility class for drawing shadows and hover effects
+├── components/                  // Custom components for GUI
+│   ├── SearchBar.java           // Custom search bar component 
 │   ├── SearchButton.java        // Search button component
 │   ├── CustomTextField.java     // Text field with custom styling to blend into the JPanel (SearchBar.java)
 │   ├── ModernButton.java        // Button designed to look like a SwiftUI rounded button
-│   ├── Menu.java        // Settings menu (**not implemented**)
+│   ├── Menu.java                // Settings menu (**not implemented**)
+│   ├── Title.java               // Custom formatted title component
 │   └── ResultsComponent.java    // Displays search results in a scrollable panel (**not implemented**)
-│   GUIProgression/
-│       └── BaseGUI.java // Base abstract class for main JFrame handles setup
-├── jars/                // External libraries 
+│   GUIProgression/              // Progression classes for GUI
+│       └── BaseGUI.java         // Base abstract class for main JFrame handles setup
+├── jars/                        // External libraries 
 │   └── flatlaf.jar
 │   └── **Lucene jars**
 ├── **Rest of files**
