@@ -68,8 +68,8 @@ GUI/
 ├── backend/                     // Backend classes for GUI
 │   └── AllenIverson.java        // Coordinates search operations and file I/O (**not implemented**)
 │   Utilities/                   // Utility classes for GUI
-│   └── ScalingUtil.java     // Utility class for scaling components to get a basic version of Swifts dynamic geometry
-│   └── DrawingUtils.java    // Utility class for drawing shadows and hover effects
+│   └── ScalingUtil.java         // Utility class for scaling components to get a basic version of Swifts dynamic geometry
+│   └── DrawingUtils.java        // Utility class for drawing shadows and hover effects
 ├── components/                  // Custom components for GUI
 │   ├── SearchBar.java           // Custom search bar component 
 │   ├── SearchButton.java        // Search button component
