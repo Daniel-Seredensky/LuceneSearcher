@@ -54,7 +54,6 @@ public class QueryManager {
 
     /**
      * Constructs a QueryManager 
-     *
      */
     private QueryManager() {
         this.validQuery = false;

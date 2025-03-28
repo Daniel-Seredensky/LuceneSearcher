@@ -1,22 +1,22 @@
 package GUI.Components;
 
+import GUI.Utilities.DrawingUtils;
 import GUI.Utilities.ScalingUtil;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.RoundRectangle2D;
 
 /**
  * ModernButton is a stylized button component.
  *
- * It takes width, height, and text as parameters. The button:
- *   - Uses a rounded shape (via a custom clip in paintComponent)
- *   - Displays a subtle hover effect (a lightened background)
- *   - Has a clean, modern appearance with proper padding
- *   - Features a subtle drop shadow for depth
+ * It takes width, height, and text as parameters. The button:<p>
+ *   - Uses a rounded shape (via a custom clip in paintComponent)<p>
+ *   - Displays a subtle hover effect (a lightened background)<p>
+ *   - Has a clean, modern appearance with proper padding<p>
+ *   - Features a subtle drop shadow for depth<p>
  */
 public class ModernButton extends JButton {
 
@@ -58,8 +58,8 @@ public class ModernButton extends JButton {
         setBorder(new EmptyBorder(paddingTop, paddingLeft, paddingBottom, paddingRight));
 
         normalBackground = Color.decode("#587785");
-        hoverBackground = lightenColor(normalBackground, 0.1f);
-        pressedBackground = darkenColor(normalBackground, 0.1f);
+        hoverBackground = DrawingUtils.lightenColor(normalBackground, 0.1f);
+        pressedBackground = DrawingUtils.darkenColor(normalBackground, 0.1f);
         borderColor = Color.decode("#587785"); 
         setBackground(normalBackground);
 
@@ -92,23 +92,6 @@ public class ModernButton extends JButton {
     }
 
     /**
-     * Lightens the given color by a fraction.
-     *
-     * @param color    the original color
-     * @param fraction fraction to lighten (e.g., 0.1 for 10%)
-     * @return a new lightened Color
-     */
-    private Color lightenColor(Color color, float fraction) {
-        int red = color.getRed();
-        int green = color.getGreen();
-        int blue = color.getBlue();
-        red = red + Math.round((255 - red) * fraction);
-        green = green + Math.round((255 - green) * fraction);
-        blue = blue + Math.round((255 - blue) * fraction);
-        return new Color(red, green, blue, color.getAlpha());
-    }
-
-    /**
      * Override paintComponent to create a custom rounded button appearance with shadow.
      */
     @Override
@@ -122,7 +105,7 @@ public class ModernButton extends JButton {
         Shape roundedRect = new RoundRectangle2D.Float(0, 0, getWidth() - shadowSize, getHeight() - shadowSize, arcRadius, arcRadius);
         
         // Draw the shadow first
-        drawShadow(g2, roundedRect);
+        DrawingUtils.drawShadow(g2, roundedRect, shadowSize, shadowColor);
         
         // Set clip to the component shape for further painting
         g2.setClip(roundedRect);
@@ -160,49 +143,5 @@ public class ModernButton extends JButton {
         g2.drawString(text, x, y);
         
         g2.dispose();
-    }
-    
-    /**
-     * Draws a shadow effect behind the component shape.
-     * 
-     * @param g2 The Graphics2D context to draw on
-     * @param shape The shape to draw the shadow for
-     */
-    private void drawShadow(Graphics2D g2, Shape shape) {
-        AffineTransform originalTransform = g2.getTransform();
-        
-        for (int i = 0; i < shadowSize; i++) {
-            float alpha = 0.5f * (shadowSize - i) / shadowSize;
-            Color currentShadowColor = new Color(
-                shadowColor.getRed(), 
-                shadowColor.getGreen(), 
-                shadowColor.getBlue(), 
-                (int)(alpha * shadowColor.getAlpha())
-            );
-            
-            g2.setColor(currentShadowColor);
-            
-            g2.translate(i > 0 ? 1 : 0, i > 0 ? 1 : 0);
-            g2.fill(shape);
-        }
-        
-        g2.setTransform(originalTransform);
-    }
-    
-    /**
-     * Darkens the given color by a fraction.
-     *
-     * @param color    the original color
-     * @param fraction fraction to darken (e.g., 0.1 for 10%)
-     * @return a new darkened Color
-     */
-    private Color darkenColor(Color color, float fraction) {
-        int red = color.getRed();
-        int green = color.getGreen();
-        int blue = color.getBlue();
-        red = Math.max(0, red - Math.round(red * fraction));
-        green = Math.max(0, green - Math.round(green * fraction));
-        blue = Math.max(0, blue - Math.round(blue * fraction));
-        return new Color(red, green, blue, color.getAlpha());
     }
 }

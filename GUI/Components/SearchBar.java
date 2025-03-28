@@ -1,5 +1,6 @@
 package GUI.Components;
 
+import GUI.Utilities.DrawingUtils;
 import GUI.Utilities.ScalingUtil;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -14,7 +15,6 @@ import java.awt.Shape;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.SwingUtilities;
 
@@ -30,6 +30,7 @@ public class SearchBar extends JPanel {
     private final int arcRadius = 30;
     private final int shadowSize = 10;
     private final Color BACKGROUND_COLOR = Color.decode("#DDE0D4"); // FETA color
+    private final Color shadowColor = new Color(0, 0, 0, 50);
     
     // Padding constants
     private final int PANEL_PADDING = 25; 
@@ -198,8 +199,6 @@ public class SearchBar extends JPanel {
         settingsButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
     }
 
-
-
     /**
      * Customize internal buttons to match the panel's aesthetic
      */
@@ -221,7 +220,7 @@ public class SearchBar extends JPanel {
         );
         
         // Draw the shadow first
-        drawShadow(g2, roundedRect);
+        DrawingUtils.drawShadow(g2, roundedRect, shadowSize, shadowColor);
         
         // Set clip to the component shape for further painting
         g2.setClip(roundedRect);
@@ -234,32 +233,6 @@ public class SearchBar extends JPanel {
         g2.draw(roundedRect);
         
         g2.dispose();
-    }
-
-    /**
-     * Draws a shadow effect behind the component shape.
-     */
-    private void drawShadow(Graphics2D g2, Shape shape) {
-        AffineTransform originalTransform = g2.getTransform();
-        
-        Color shadowColor = new Color(0, 0, 0, 50);
-        
-        for (int i = 0; i < shadowSize; i++) {
-            float alpha = 0.5f * (shadowSize - i) / shadowSize;
-            Color currentShadowColor = new Color(
-                shadowColor.getRed(), 
-                shadowColor.getGreen(), 
-                shadowColor.getBlue(), 
-                (int)(alpha * shadowColor.getAlpha())
-            );
-            
-            g2.setColor(currentShadowColor);
-            
-            g2.translate(i > 0 ? 1 : 0, i > 0 ? 1 : 0);
-            g2.fill(shape);
-        }
-        
-        g2.setTransform(originalTransform);
     }
 
     // Getter methods for implementing additional handlers

@@ -2,6 +2,8 @@ package GUI;
 
 import GUI.GUIProgression.BaseGUI;
 import GUI.Components.SearchBar;
+import GUI.Components.Title;
+import GUI.Utilities.ScalingUtil;
 import javax.swing.*;
 import java.awt.*;
 
@@ -11,6 +13,7 @@ import java.awt.*;
 public class ComponentTest extends BaseGUI {
     
     private SearchBar searchBar;
+    private Title titleComponent;
     
     public ComponentTest() {
         super("UI Components Test");
@@ -19,36 +22,34 @@ public class ComponentTest extends BaseGUI {
     @Override
     protected void initializeComponents() {
         searchBar = new SearchBar();
-        
+        titleComponent = new Title("FooBar", "The Code Librarian");
     }
     
     @Override
     protected void layoutComponents() {
         Container contentPane = getContentPane();
-        
         contentPane.setLayout(new BorderLayout());
         
-        JPanel centeringPanel = new JPanel();
-        centeringPanel.setOpaque(false); 
-        centeringPanel.setLayout(new BoxLayout(centeringPanel, BoxLayout.Y_AXIS));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setOpaque(false);
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        mainPanel.add(Box.createVerticalStrut(ScalingUtil.scalePadding(50)));
         
-        // Add glue before the search bar to push it down from the top
-        centeringPanel.add(Box.createVerticalGlue());
+        mainPanel.add(titleComponent);
         
-        // Create a horizontal box for horizontal centering
+        mainPanel.add(Box.createVerticalStrut(ScalingUtil.scalePadding(200)));
+        
         Box horizontalBox = Box.createHorizontalBox();
         horizontalBox.add(Box.createHorizontalGlue());
         horizontalBox.add(searchBar);
         horizontalBox.add(Box.createHorizontalGlue());
         
-        // Add the horizontal box to the centering panel
-        centeringPanel.add(horizontalBox);
+        mainPanel.add(horizontalBox);
         
-        // Add glue after the search bar to push it up from the bottom
-        centeringPanel.add(Box.createVerticalGlue());
+        mainPanel.add(Box.createVerticalGlue());
         
-        // Add the centering panel to the content pane
-        contentPane.add(centeringPanel, BorderLayout.CENTER);
+        contentPane.add(mainPanel, BorderLayout.CENTER);
     }
     
     public static void main(String[] args) {
