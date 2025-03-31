@@ -41,16 +41,17 @@ java -cp "jars/*:." GUI/ComponentTest.java
 
 ``` mermaid 
 flowchart TD
-    SM[SearchManager\n(Coordinates overall search logic)]
+flowchart TD
+    SM[SearchManager (Coordinates overall search logic)]
     QM[QueryManager]
-    MP[MyQueryParser\n(Custom parser that creates field-specific queries)]
-    LS[LuceneSearcher\n(Executes search using built query)]
-    R[Results\n(Extracts and formats key fields and best-match fragments)]
+    MP[MyQueryParser (Custom parser that creates field-specific queries)]
+    LS[LuceneSearcher (Executes search using built query)]
+    R[Results (Extracts and formats key fields and best-match fragments)]
 
-    SM -->|Calls| QM
-    QM -->|Utilizes| MP
-    QM -->|Passes built query| LS
-    LS -->|Generates| R
+    SM --> QM
+    QM --> MP
+    QM --> LS
+    LS --> R
 ```
 
 # GUI
@@ -82,22 +83,22 @@ GUI/
 ``` mermaid
 flowchart TD
     A[GUI/]
-    B[GUI.java\n(Main JFrame, not implemented)]
+    B[GUI.java (Main JFrame, not implemented)]
     C[backend/]
-    D[AllenIverson.java\n(Coordinates search operations and file I/O, not implemented)]
+    D[AllenIverson.java (Coordinates search operations and file I/O, not implemented)]
     E[Utilities/]
-    F[ScalingUtil.java\n(Scales components for dynamic geometry)]
-    G[DrawingUtils.java\n(Draws shadows and hover effects)]
+    F[ScalingUtil.java (Scales components for dynamic geometry)]
+    G[DrawingUtils.java (Draws shadows and hover effects)]
     H[components/]
-    I[SearchBar.java\n(Custom search bar component)]
-    J[SearchButton.java\n(Search button component)]
-    K[CustomTextField.java\n(Styled text field for SearchBar)]
-    L[ModernButton.java\n(SwiftUI-like rounded button)]
-    M[Menu.java\n(Settings menu, not implemented)]
-    N[Title.java\n(Custom formatted title component)]
-    O[ResultsComponent.java\n(Displays search results in a scrollable panel, not implemented)]
+    I[SearchBar.java (Custom search bar component)]
+    J[SearchButton.java (Search button component)]
+    K[CustomTextField.java (Styled text field for SearchBar)]
+    L[ModernButton.java (SwiftUI-like rounded button)]
+    M[Menu.java (Settings menu, not implemented)]
+    N[Title.java (Custom formatted title component)]
+    O[ResultsComponent.java (Displays search results in a scrollable panel, not implemented)]
     P[GUIProgression/]
-    Q[BaseGUI.java\n(Abstract class for main JFrame setup)]
+    Q[BaseGUI.java (Abstract class for main JFrame setup)]
     R[jars/]
     S[flatlaf.jar]
     T[Lucene jars]
