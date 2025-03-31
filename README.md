@@ -14,7 +14,7 @@
 
 - ***note*** I use zsh for my terminal
 
-``` zsh
+```zsh
 # compiles the java files in the main dir, and the GUI files 
 javac -cp "jars/*:." *.java GUI/*.java GUI/*/*.java
 ```
@@ -31,7 +31,7 @@ javac -cp "jars/*:." *.java GUI/*.java GUI/*/*.java
 - ***changed*** boolean flag to only index changed documents
 - ***missing*** boolean flag to only index missing documents
 
-``` zsh
+```zsh
 java -cp "jars/*:." FinalProjMain -kwarg1 value1 -kwarg2 value2
 # test the GUI
 java -cp "jars/*:." GUI/ComponentTest.java
@@ -56,7 +56,7 @@ flowchart TD
 
 # GUI
 
-``` plaintext
+```plaintext
 GUI/
 ├── GUI.java                     // Main JFrame (**not implemented**)
 ├── backend/                     // Backend classes for GUI
@@ -122,5 +122,4 @@ flowchart TD
     A --> R
     R --> S
     R --> T
-
 ```
