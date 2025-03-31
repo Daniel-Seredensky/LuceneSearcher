@@ -41,7 +41,6 @@ java -cp "jars/*:." GUI/ComponentTest.java
 
 ``` mermaid 
 flowchart TD
-flowchart TD
     SM[SearchManager (Coordinates overall search logic)]
     QM[QueryManager]
     MP[MyQueryParser (Custom parser that creates field-specific queries)]
