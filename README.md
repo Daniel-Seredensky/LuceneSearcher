@@ -39,25 +39,48 @@ java -cp "jars/*:." GUI/ComponentTest.java
 
 # Search Logic 
 
-``` plaintext
-+---------------------+
-|    SearchManager    |  <-- Coordinates overall search logic
-+---------------------+
-           |  First calls the QueryManager
-           v
-+---------------------+     +---------------------+
-|    QueryManager     | <-- |    MyQueryParser    |  <-- Custom parser that creates field-specific queries
-+---------------------+     +---------------------+
-           |  After Query is build it is passed to the LuceneSearcher
-           v
-+---------------------+
-|   LuceneSearcher    |  <-- Executes the search using the built query from Query Manger (using search(query))
-+---------------------+
-           | Results object created by Results.fromTopDoc(topDocs)
-           v
-+---------------------+
-|      Results        |  <-- Extracts and formats key fields and best-match fragments 
-+---------------------+
+``` mermaid
+flowchart TD
+    A[GUI/]
+    B[GUI.java<br/>(Main JFrame, not implemented)]
+    C[backend/]
+    D[AllenIverson.java<br/>(Coordinates search operations and file I/O, not implemented)]
+    E[Utilities/]
+    F[ScalingUtil.java<br/>(Scales components for dynamic geometry)]
+    G[DrawingUtils.java<br/>(Draws shadows and hover effects)]
+    H[components/]
+    I[SearchBar.java<br/>(Custom search bar component)]
+    J[SearchButton.java<br/>(Search button component)]
+    K[CustomTextField.java<br/>(Styled text field for SearchBar)]
+    L[ModernButton.java<br/>(SwiftUI-like rounded button)]
+    M[Menu.java<br/>(Settings menu, not implemented)]
+    N[Title.java<br/>(Custom formatted title component)]
+    O[ResultsComponent.java<br/>(Displays search results in a scrollable panel, not implemented)]
+    P[GUIProgression/]
+    Q[BaseGUI.java<br/>(Abstract class for main JFrame setup)]
+    R[jars/]
+    S[flatlaf.jar]
+    T[Lucene jars]
+
+    A --> B
+    A --> C
+    C --> D
+    C --> E
+    E --> F
+    E --> G
+    A --> H
+    H --> I
+    H --> J
+    H --> K
+    H --> L
+    H --> M
+    H --> N
+    H --> O
+    A --> P
+    P --> Q
+    A --> R
+    R --> S
+    R --> T
 ```
 
 # GUI

@@ -39,7 +39,7 @@ public abstract class BaseGUI extends JFrame {
         // Basic JFrame settings
         setTitle(title);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(ScalingUtil.scaleWidth(800), ScalingUtil.scaleHeight(600));
+        setSize(ScalingUtil.scaleWidth(1200), ScalingUtil.scaleHeight(800));
         setLocationRelativeTo(null); // Center the window on the screen
 
         // Call abstract methods to allow subclass customization of UI components.

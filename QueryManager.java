@@ -35,7 +35,7 @@ public class QueryManager {
     );
     // All searchable fields (both analyzed and non-analyzed).
     private static final String[] ALL_FIELDS = new String[]{
-            "content", "stemcontent", "stopcontent", "author", "title", "filename", "filepath", "modified"
+            "content", "stem", "stop", "author", "title", "filename", "filepath", "modified"
     };
     
     //singleton instance 

@@ -265,8 +265,8 @@ public class TextFileIndexer {
 
         // Add required fields.
         document.add(new TextField("content", content, Field.Store.YES));
-        document.add(new TextField("stemcontent", stemcontent, Field.Store.YES));
-        document.add(new TextField("stopcontent", stopcontent, Field.Store.YES));
+        document.add(new TextField("stem", stemcontent, Field.Store.YES));
+        document.add(new TextField("stop", stopcontent, Field.Store.YES));
         document.add(new StringField("author", author, Field.Store.YES));
         // Use title if found; otherwise default to filename.
         document.add(new StringField("title", title.isEmpty() ? file.getName() : title, Field.Store.YES));
