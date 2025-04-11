@@ -57,7 +57,7 @@ flowchart TD
 
 ```plaintext
 GUI/
-├── GUI.java                     // Main JFrame (**not implemented**)
+├── GUI.java                     // Main JFrame (**currently aliased as ComponentTest.java**)
 ├── backend/                     // Backend classes for GUI
 │   └── AllenIverson.java        // Coordinates search operations and file I/O (**not implemented**)
 │   Utilities/                   // Utility classes for GUI
@@ -70,12 +70,13 @@ GUI/
 │   ├── ModernButton.java        // Button designed to look like a SwiftUI rounded button
 │   ├── Menu.java                // Settings menu (**not implemented**)
 │   ├── Title.java               // Custom formatted title component (**not used**)
-│   ├── Result               // Custom formatted title component (**not used**)
-│   └── ResultsComponent.java    // Displays search results in a scrollable panel (**not implemented**)
+│   ├── BaseResultCard.java      // Sets up the result card colors, hover animation, and parses the result text
+│   ├── ResultCard.java          // Handles the design of the result card, scrollable panel, and hover effect for the scroll bar
+│   └── ResultsPanel.java        // Displays search results in a scrollable panel 
 │   GUIProgression/              // Progression classes for GUI
-│       └── BaseGUI.java         // Base abstract class for main JFrame handles setup
+│   └── BaseGUI.java             // Base abstract class for main JFrame handles setup
 ├── jars/                        // External libraries 
-│   └── flatlaf.jar
+│   └── flatlaf.jar              // FlatLaf look and feel for GUI
 │   └── **Lucene jars**
 ├── **Rest of files**
 ```
