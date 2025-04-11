@@ -28,7 +28,7 @@ import java.util.Set;
  * </p>
  *
  * @version March 2025
- * @author Daniel Seredensky, Oliwia, Ojo
+ * @author Daniel Seredensky, Oliwia, Ojo, William
  */
 public class Results {
     private List<ResultItem> items;

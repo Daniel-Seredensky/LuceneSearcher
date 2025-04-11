@@ -1,5 +1,7 @@
 /**
  * ResultItem represents a single search result.
+ * 
+ * @author Daniel, Oliwia, Ojo, William
  */
 class ResultItem {
     private String filename;

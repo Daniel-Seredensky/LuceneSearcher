@@ -28,7 +28,7 @@ import java.io.PrintWriter;
  *   {@link CranfieldCleaner#clean()}
  * 
  * @version March 2025
- * @author Daniel Seredensky, Oliwia, Ojo
+ * @author Daniel, Oliwia, Ojo, William
  */
 public class CranfieldCleaner {
 
@@ -50,11 +50,10 @@ public class CranfieldCleaner {
         
         // Create output directory if it doesn't exist.
         File outputDir = new File("./cranfieldSeparated/");
-        // Create output directory if it doesn't exist.
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         } else {
-            // Delete all files in the output directory because if clean is called assume we want to start fresh.
+            // Delete all files in the output directory because if clean is called assume we want to start fresh
             for (File file : outputDir.listFiles()) {
                 file.delete();
             }
@@ -71,12 +70,11 @@ public class CranfieldCleaner {
             
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(".I")) {
-                    // If a document is in progress, write it out.
                     if (currentFileName != null) {
                         writeDocument(outputDir, currentFileName, titleBuilder.toString(), author, processContent(contentBuilder.toString()));
                     }
                     // Start a new document.
-                    currentFileName = line.substring(2).trim();  // e.g., "1"
+                    currentFileName = line.substring(2).trim();  
                     titleBuilder = new StringBuilder();
                     author = "";
                     contentBuilder = new StringBuilder();
@@ -166,7 +164,6 @@ public class CranfieldCleaner {
      * @throws IOException
      */
     private static void writeDocument(File outputDir, String fileName, String title, String author, String content) throws IOException {
-        // Clean up title by replacing multiple spaces.
         String cleanTitle = title.replaceAll("\\s+", " ").trim();
         File outFile = new File(outputDir, fileName + ".txt");
         try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {

@@ -14,7 +14,7 @@ import java.nio.file.Paths;
  * <p>
  * Singleton pattern is used to ensure a single instance of LuceneSearcher
  * @version March 2025
- * @author Daniel Seredensky, Oliwia, Ojo
+ * @author Daniel, Oliwia, Ojo, William
  */
 public class LuceneSearcher {
     private Directory indexDirectory;

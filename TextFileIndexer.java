@@ -47,14 +47,14 @@ import java.util.Set;
  *   <li>modified: The file’s last modified timestamp.</li>
  * </ul>
  * 
- * The run method inherets params from 
+ * Usage:
  * <pre>
  *   TextFileIndexer.run(dataDirPath, indexDirPath, mode, isGutenberg);
  * </pre>
  * 
  * @version March 2025
  * @author A cs Professor
- * @author adapted by Daniel Seredensky, Oliwia, Ojo
+ * @author adapted by Daniel Seredensky, Oliwia, Ojo, William 
  */
 public class TextFileIndexer {
 
@@ -161,11 +161,10 @@ public class TextFileIndexer {
             reader.close();
         }
 
-        // List all .txt files in the data directory.
         File dataDir = new File(dataDirPath);
         File[] files = dataDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
 
-        // Build a set of file paths present in the directory for "missing" processing.
+        // Build a set of file paths present in the directory for "missing" processing 
         Set<String> currentFilePaths = new HashSet<>();
         if (files != null) {
             for (File file : files) {
@@ -188,7 +187,7 @@ public class TextFileIndexer {
                         added++;
                     }
                 } else if (option.equals("changed")) {
-                    // Only update files that are already indexed and have been modified.
+                    // Only update files that are already indexed and have been modified
                     if (info != null && file.lastModified() > info.modifiedTime) {
                         writer.updateDocument(new Term("filepath", file.getAbsolutePath()), createDocument(file, isGutenberg));
                         changed++;
@@ -231,14 +230,14 @@ public class TextFileIndexer {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Extract author and title from any line in the file.
+                // Extract author and title from any line in the file 
                 if (line.contains("Author:") && author.isEmpty()) {
                     author = line.substring(line.indexOf("Author:") + "Author:".length()).trim();
                 }
                 if (title.isEmpty() && line.contains("Title:")) {
                     title = line.substring(line.indexOf("Title:") + "Title:".length()).trim();
                 }
-                // If Gutenberg extraction is enabled, collect only the text between the markers.
+                // If Gutenberg extraction is enabled, collect only the text between the markers
                 if (isGutenberg) {
                     if (line.contains("START OF THE PROJECT GUTENBERG EBOOK")) {
                         inGutenbergBlock = true;
@@ -263,12 +262,12 @@ public class TextFileIndexer {
         String stemcontent = applyStemming(content);
         String stopcontent = removeStopWords(content);
 
-        // Add required fields.
+        // Add required fields 
         document.add(new TextField("content", content, Field.Store.YES));
         document.add(new TextField("stem", stemcontent, Field.Store.YES));
         document.add(new TextField("stop", stopcontent, Field.Store.YES));
         document.add(new StringField("author", author, Field.Store.YES));
-        // Use title if found; otherwise default to filename.
+        // Use title if found; otherwise default to filename
         document.add(new StringField("title", title.isEmpty() ? file.getName() : title, Field.Store.YES));
         document.add(new StringField("filename", file.getName(), Field.Store.YES));
         document.add(new StringField("filepath", file.getAbsolutePath(), Field.Store.YES));
@@ -284,15 +283,15 @@ public class TextFileIndexer {
      * @return A string with stemmed tokens.
      */
     private static String applyStemming(String text) throws IOException {
-        // Create a StandardTokenizer reading from the text.
+        // Create a StandardTokenizer reading from the text
         StandardTokenizer tokenizer = new StandardTokenizer();
         tokenizer.setReader(new StringReader(text));
         
-        // Build a token stream with lowercasing and stemming.
+        // Build a token stream with lowercasing and stemming
         TokenStream tokenStream = new LowerCaseFilter(tokenizer);
         tokenStream = new PorterStemFilter(tokenStream);
         
-        // Process the token stream.
+        // Process the token stream
         tokenStream.reset();
         StringBuilder sb = new StringBuilder();
         CharTermAttribute charTermAttr = tokenStream.addAttribute(CharTermAttribute.class);

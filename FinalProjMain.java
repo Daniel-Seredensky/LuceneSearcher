@@ -23,7 +23,7 @@ public class FinalProjMain {
      *   <li>-cran: Boolean to enable Bonus <b> Haven't gotten there yet </b> </li>
      * </ul>
      * 
-     * @author Daniel Seredensky, Oliwia, Ojo
+     * @author Daniel, Oliwia, Ojo, William
      * @version March 2025
      */
 

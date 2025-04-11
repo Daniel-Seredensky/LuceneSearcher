@@ -27,32 +27,35 @@ public class SearchBar extends JPanel {
     private final SearchButton searchButton;
     private final ModernButton helpButton;
     private final ModernButton settingsButton;
-    private final int arcRadius = 30;
-    private final int shadowSize = 10;
+    private final double ratio = 1.125;
+
+    private final int arcRadius = (int)(30 * ratio);
+    private final int shadowSize = (int)(10 * ratio);
     private final Color BACKGROUND_COLOR = Color.decode("#DDE0D4"); // FETA color
     private final Color shadowColor = new Color(0, 0, 0, 50);
-    
+
     // Padding constants
-    private final int PANEL_PADDING = 25; 
-    private final int COMPONENT_SPACING = 15;
-    
+    private final int PANEL_PADDING = (int)(40 * ratio);
+    private final int COMPONENT_SPACING = (int)(15 * ratio);
+
     // Maximum size values (for fullscreen)
-    private final int MAX_WIDTH = 600;
-    private final int MAX_HEIGHT = 130;
-    private final int MAX_USABLE_WIDTH = 580;
-    private final int MAX_TEXT_FIELD_HEIGHT = 80;
-    private final int MAX_SEARCH_BUTTON_SIZE = 50;
-    private final int MAX_BUTTON_WIDTH = 100;
-    private final int MAX_BUTTON_HEIGHT = 35;
-    
+    private final int MAX_WIDTH = (int)(600 * ratio);
+    private final int MAX_HEIGHT = (int)(100 * ratio);
+    private final int MAX_USABLE_WIDTH = (int)(590 * ratio);
+    private final int MAX_TEXT_FIELD_HEIGHT = (int)(60 * ratio);
+    private final int MAX_SEARCH_BUTTON_SIZE = (int)(50 * ratio);
+    private final int MAX_BUTTON_WIDTH = (int)(100 * ratio);
+    private final int MAX_BUTTON_HEIGHT = (int)(35 * ratio);
+
     // Minimum size values (for 800x600 frame)
-    private final int MIN_WIDTH = 400;
-    private final int MIN_HEIGHT = 100;
-    private final int MIN_USABLE_WIDTH = 350;
-    private final int MIN_TEXT_FIELD_HEIGHT = 60;
-    private final int MIN_SEARCH_BUTTON_SIZE = 40;
-    private final int MIN_BUTTON_WIDTH = 80;
-    private final int MIN_BUTTON_HEIGHT = 30;
+    private final int MIN_WIDTH = (int)(400 * ratio);
+    private final int MIN_HEIGHT = (int)(70 * ratio);
+    private final int MIN_USABLE_WIDTH = (int)(350 * ratio);
+    private final int MIN_TEXT_FIELD_HEIGHT = (int)(60 * ratio);
+    private final int MIN_SEARCH_BUTTON_SIZE = (int)(40 * ratio);
+    private final int MIN_BUTTON_WIDTH = (int)(80 * ratio);
+    private final int MIN_BUTTON_HEIGHT = (int)(30 * ratio);
+
     
     // Current size values
     private int currentWidth = MAX_WIDTH;
@@ -130,7 +133,6 @@ public class SearchBar extends JPanel {
         // Calculate scaling ratio based on window size
         double ratio = ScalingUtil.calculateWindowSizeRatio(window);
         
-        // Apply scaling to search bar dimensions
         currentWidth = ScalingUtil.calculateScaledValue(MIN_WIDTH, MAX_WIDTH, ratio);
         currentHeight = ScalingUtil.calculateScaledValue(MIN_HEIGHT, MAX_HEIGHT, ratio);
         currentUsableWidth = ScalingUtil.calculateScaledValue(MIN_USABLE_WIDTH, MAX_USABLE_WIDTH, ratio);
@@ -162,7 +164,7 @@ public class SearchBar extends JPanel {
      * Layout components with proper padding and spacing
      */
     private void layoutComponentsWithPadding() {
-        // TextField positioning (with padding from panel edges)
+        // TextField positioning 
         textField.setBounds(
             PANEL_PADDING, 
             PANEL_PADDING, 
@@ -170,7 +172,7 @@ public class SearchBar extends JPanel {
             currentTextFieldHeight
         );
         
-        // Search button positioning (right of text field with spacing)
+        // Search button positioning 
         searchButton.setBounds(
             PANEL_PADDING + currentUsableWidth - currentSearchButtonSize, 
             PANEL_PADDING + (currentTextFieldHeight - currentSearchButtonSize) / 2, // Vertically center
@@ -178,7 +180,7 @@ public class SearchBar extends JPanel {
             currentSearchButtonSize
         );
         
-        // Help button positioning (with padding and spacing)
+        // Help button positioning
         helpButton.setBounds(
             PANEL_PADDING, 
             PANEL_PADDING + currentTextFieldHeight + COMPONENT_SPACING, 
@@ -186,7 +188,7 @@ public class SearchBar extends JPanel {
             currentButtonHeight
         );
         
-        // Settings button positioning (right of help button with spacing)
+        // Settings button positioning 
         settingsButton.setBounds(
             PANEL_PADDING + currentButtonWidth + COMPONENT_SPACING, 
             PANEL_PADDING + currentTextFieldHeight + COMPONENT_SPACING, 
@@ -194,7 +196,6 @@ public class SearchBar extends JPanel {
             currentButtonHeight
         );
         
-        // Update button sizes
         helpButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
         settingsButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
     }
@@ -219,13 +220,10 @@ public class SearchBar extends JPanel {
             arcRadius, arcRadius
         );
         
-        // Draw the shadow first
         DrawingUtils.drawShadow(g2, roundedRect, shadowSize, shadowColor);
         
-        // Set clip to the component shape for further painting
         g2.setClip(roundedRect);
         
-        // Fill the background
         g2.setColor(BACKGROUND_COLOR);
         g2.fill(roundedRect);
         

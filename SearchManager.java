@@ -23,7 +23,7 @@ import java.util.Set;
  * </p>
  *
  * @version March 2025
- * @author Daniel Seredensky, Oliwia, Ojo
+ * @author Daniel Seredensky, Oliwia, Ojo, William
  */
 public class SearchManager {
     private String indexDirPath;
@@ -145,7 +145,7 @@ public class SearchManager {
         if (!queryManager.isValid()) {
             return "Invalid query. Enter *help* for guidance on valid queries.";
         }
-        // Retrieve the built Lucene Query.
+        // Retrieve the built Lucene Query 
         Query query = queryManager.getBuiltQuery();
         System.out.println("Your Constructed Lucene Query: " + query.rewrite(luceneSearcher.getIndexReader()).toString());
         System.out.println(""); // new line because it looks better
@@ -153,10 +153,10 @@ public class SearchManager {
         // Get the set of requested fields (either detected from fielded syntax or default to all fields).
         Set<String> requestedFields = queryManager.findRequestedFields();
 
-        // Create a LuceneSearcher instance.
+        // Retrieve the top search results from the searcher
         TopDocs topDocs = luceneSearcher.search(query);
 
-        // Process the TopDocs and build a formatted results output.
+        // Process the TopDocs and build a formatted results output string
         Results resultsOutput = Results.fromTopDocs(luceneSearcher.getIndexSearcher(), query, topDocs, queryManager.getPerFieldAnalyzer(), requestedFields, explain);
         
         return resultsOutput.getTotalHits() != 0 ? resultsOutput.toString() : "No results found.";

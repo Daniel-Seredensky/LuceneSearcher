@@ -63,7 +63,7 @@ public class ModernButton extends JButton {
         borderColor = Color.decode("#587785"); 
         setBackground(normalBackground);
 
-        // Add mouse listeners for hover and press effects
+        // Add mouse listener for hover color change
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -97,7 +97,7 @@ public class ModernButton extends JButton {
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
-        // Enable anti-aliasing for smoother rounded corners.
+        // Enable anti-aliasing for smoother rounded corners
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         
@@ -124,14 +124,12 @@ public class ModernButton extends JButton {
         g2.setColor(currentColor);
         g2.fill(roundedRect);
         
-        // Draw a subtle border
         g2.setColor(borderColor);
         g2.draw(roundedRect);
         
         // Reset clip before drawing text
         g2.setClip(null);
         
-        // Draw the text
         FontMetrics fm = g2.getFontMetrics();
         Rectangle textRect = new Rectangle(0, 0, getWidth() - shadowSize, getHeight() - shadowSize);
         String text = getText();

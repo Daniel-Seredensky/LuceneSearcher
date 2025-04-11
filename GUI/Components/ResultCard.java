@@ -9,164 +9,306 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.BorderFactory;
+import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-/**
- * A ResultCard represents one result from the Lucene search output.
- * It parses the provided result string to display the required fields.
- */
-public class ResultCard extends JPanel {
 
-    // Fields parsed from the result string
-    private int resultNumber;
-    private String filename;
-    private String title;
-    private String author;
-    private double score;
-    private String bestFragment;
-    private String fullExplanation;
-
-    // Colors from the theme
-    private final Color PUNGA = new Color(0x4D483D);       // main background (used here for text/shadow)
-    private final Color FETA = new Color(0xDDE0D4);        // card background
-
+public class ResultCard extends BaseResultCard {
+    private JPanel contentPanel;
+    private JScrollPane scrollPane;
+    private boolean showDetails = false;
+    
     /**
-     * Constructs a new ResultCard by parsing the provided result string.
-     * 
-     * @param resultString the raw string representing the result output
-     */
-    public ResultCard(String resultString) {
-        System.out.println("String: "+ resultString);
-        parseResultString(resultString);
-        // Set a preferred size (could be adjusted dynamically based on content)
-        setPreferredSize(new Dimension(ScalingUtil.scaleWidth(400), ScalingUtil.scaleHeight(200)));
-        // Make the panel non-opaque so we can paint a custom background
-        setOpaque(false);
-    }
-
-    /**
-     * Parses the result string into component fields.
-     * Supports both a basic result and one with a best matching fragment and explanation.
-     * 
+     * Constructs a new ResultCard using the provided result string.
+     *
      * @param resultString the raw result string
      */
-    private void parseResultString(String resultString) {
-        String[] lines = resultString.split("\\n");
-        StringBuilder explanationBuilder = new StringBuilder();
-        boolean readingExplanation = false;
-
-        for (String line : lines) {
-            if (line.startsWith("Result Number:")) {
-                try {
-                    resultNumber = Integer.parseInt(line.substring("Result Number:".length()).trim());
-                } catch (NumberFormatException e) {
-                    resultNumber = -1;
-                }
-            } else if (line.startsWith("Filename:")) {
-                filename = line.substring("Filename:".length()).trim();
-            } else if (line.startsWith("Title:")) {
-                title = line.substring("Title:".length()).trim();
-            } else if (line.startsWith("Author:")) {
-                author = line.substring("Author:".length()).trim();
-            } else if (line.startsWith("Score:")) {
-                try {
-                    score = Double.parseDouble(line.substring("Score:".length()).trim());
-                } catch (NumberFormatException e) {
-                    score = 0.0;
-                }
-            } else if (line.startsWith("Best Fragment")) {
-                int colonIndex = line.indexOf(":");
-                if (colonIndex != -1) {
-                    bestFragment = line.substring(colonIndex + 1).trim();
-                }
-            } else if (line.startsWith("Full Explanation:")) {
-                readingExplanation = true;
-            } else {
-                if (readingExplanation) {
-                    explanationBuilder.append(line).append("\n");
-                }
+    public ResultCard(String resultString) {
+        super(resultString);
+        
+        setLayout(new BorderLayout());
+        
+        // Create the content panel that will be painted
+        contentPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                paintCardContent(g);
             }
-        }
-        if (explanationBuilder.length() > 0) {
-            fullExplanation = explanationBuilder.toString().trim();
-        }
-    }
+        };
+        contentPanel.setOpaque(false);
+        
+        // Create and configure the scroll pane
+        scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        
+        // Initialize with hidden scrollbars (they will be shown on hover)
+        scrollPane.getVerticalScrollBar().setVisible(false);
+        
+        add(scrollPane, BorderLayout.CENTER);
+        
+        // Override mouse listeners to handle scrollbar visibility ^^
+        removeMouseListener(getMouseListeners()[0]);
+        
+        MouseAdapter mouseAdapter = new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                isHovered = true;
+                showDetails = true;
+                targetHeight = EXPANDED_HEIGHT;
+                scrollPane.getVerticalScrollBar().setVisible(true);
+                startAnimation();
+            }
 
+            @Override
+            public void mouseExited(MouseEvent e) {
+                isHovered = false;
+                showDetails = false;
+                targetHeight = COLLAPSED_HEIGHT;
+                scrollPane.getVerticalScrollBar().setVisible(false);
+                startAnimation();
+            }
+        };
+        
+        addMouseListener(mouseAdapter);
+        contentPanel.addMouseListener(mouseAdapter);
+        scrollPane.addMouseListener(mouseAdapter);
+        
+        // Prevent the scrollbar from triggering mouseExit
+        scrollPane.getVerticalScrollBar().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                isHovered = true;
+                showDetails = true;
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                // Don't change the hover state when leaving the scrollbar
+                // This prevents the scrollbar from disappearing when using it
+            }
+        });
+    }
+    
     /**
-     * Custom painting of the card.
-     * This draws the card’s background (with shadow) and all text elements with a shadow effect.
-     *
-     * @param g the Graphics context to use for painting
+     * Override the startAnimation method to handle content panel resizing
      */
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    protected void startAnimation() {
+        animationStep = 0;
+        if (animationTimer.isRunning()) {
+            animationTimer.stop();
+        }
+        
+        // Update the animation timer to also adjust the content panel height
+        animationTimer.addActionListener(e -> {
+            // Make sure the content panel is tall enough to show all content when hovered
+            if (showDetails) {
+                int minContentHeight = calculateMinimumContentHeight();
+                contentPanel.setPreferredSize(new Dimension(originalSize.width, 
+                    Math.max(targetHeight, minContentHeight)));
+            } else {
+                contentPanel.setPreferredSize(new Dimension(originalSize.width, COLLAPSED_HEIGHT));
+            }
+            contentPanel.revalidate();
+            contentPanel.repaint();
+        });
+        
+        animationTimer.start();
+    }
+    
+    /**
+     * Calculate the minimum height needed to display all content
+     */
+    private int calculateMinimumContentHeight() {
+        int padding = ScalingUtil.scalePadding(25);
+        Font normalFont = new Font("SansSerif", Font.PLAIN, ScalingUtil.scaleWidth(14));
+        int baseHeight = padding * 3 + ScalingUtil.scaleWidth(40) + ScalingUtil.scalePadding(25) + 
+                normalFont.getSize() + ScalingUtil.scaleHeight(30) + ScalingUtil.scalePadding(25);
+        
+        int textContentHeight = 0;
+        if (bestFragment != null && !bestFragment.isEmpty()) {
+            textContentHeight += (normalFont.getSize() + ScalingUtil.scalePadding(5)) * 2;
+            textContentHeight += (normalFont.getSize() + ScalingUtil.scalePadding(5)) * 
+                    (bestFragment.length() / 50 + 1); 
+        }
+        
+        if (fullExplanation != null && !fullExplanation.isEmpty()) {
+            textContentHeight += (normalFont.getSize() + ScalingUtil.scalePadding(5)) * 2;
+            String[] explanationLines = fullExplanation.split("\n");
+            textContentHeight += (normalFont.getSize() + ScalingUtil.scalePadding(5)) * explanationLines.length;
+        }
+        
+        return baseHeight + textContentHeight ;
+    }
+    
+    /**
+     * Custom painting of the card content.
+     *
+     * @param g the Graphics context
+     */
+    protected void paintCardContent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
 
         // Enable anti-aliasing for smooth edges and text
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         int width = getWidth();
-        int height = getHeight();
+        int height = showDetails ? Math.max(getHeight(), calculateMinimumContentHeight()) : COLLAPSED_HEIGHT;
+        width -= ScalingUtil.scalePadding(10);
+        height -= ScalingUtil.scalePadding(10);
 
-        // Define arc for rounded corners using a scaled value
-        int arc = ScalingUtil.scaleWidth(15);
+        // Create a rounded rectangle for the card shape
+        int arc = ScalingUtil.scaleWidth(30);
         Shape cardShape = new RoundRectangle2D.Float(0, 0, width, height, arc, arc);
 
-        // Draw shadow behind the card
-        Color shadowColor = DrawingUtils.createShadowColor(100); // semi-transparent black
-        int shadowSize = ScalingUtil.scalePadding(5);
+        // Draw shadow behind the card using a helper from DrawingUtils
+        Color shadowColor = DrawingUtils.createShadowColor(100); // Semi-transparent shadow
+        int shadowSize = ScalingUtil.scalePadding(10);
         DrawingUtils.drawShadow(g2, cardShape, shadowSize, shadowColor);
 
-        // Fill the card background with FETA color
-        g2.setColor(FETA);
+        // Fill the card background with a darkened version of the theme color PUNGA
+        Color backgroundColor = DrawingUtils.darkenColor(PUNGA, 0.4f);
+        backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), 
+                                    backgroundColor.getBlue(), 150); // Slight transparency
+        g2.setColor(backgroundColor);
         g2.fill(cardShape);
 
-        // Prepare text rendering parameters
-        int padding = ScalingUtil.scalePadding(10);
-        int yPosition = padding + ScalingUtil.scaleWidth(20); // initial vertical position
-
-        // Set up fonts (scaled based on reference resolution)
-        Font titleFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleWidth(16));
+        // Setup font and padding parameters
+        int padding = ScalingUtil.scalePadding(25);
+        Font titleFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleWidth(22));
         Font normalFont = new Font("SansSerif", Font.PLAIN, ScalingUtil.scaleWidth(14));
+        Font circleFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleWidth(16));
+        Color textColor = FETA;
+        int textShadowSize = ScalingUtil.scalePadding(8);
 
-        // Text color (using PUNGA for contrast)
-        Color textColor = PUNGA;
-        int textShadowSize = ScalingUtil.scalePadding(2);
+        // Draw the result number inside a circle
+        int circleSize = ScalingUtil.scaleWidth(40);
+        int circleX = padding;
+        int circleY = padding;
+        Ellipse2D.Double circle = new Ellipse2D.Double(circleX, circleY, circleSize, circleSize);
+        g2.setColor(ACCENT_COLOR);
+        g2.fill(circle);
+        String resultNumberStr = String.valueOf(resultNumber);
+        int textWidth = g2.getFontMetrics(circleFont).stringWidth(resultNumberStr);
+        int textHeight = g2.getFontMetrics(circleFont).getHeight();
+        g2.setColor(textColor);
+        g2.setFont(circleFont);
+        g2.drawString(resultNumberStr, circleX + (circleSize - textWidth) / 2, 
+                circleY + circleSize / 2 + textHeight / 4);
 
-        // Draw the parsed text lines using our utility method for text with shadow
-        DrawingUtils.drawTextWithShadow(g2, "Result Number: " + resultNumber, padding, yPosition, normalFont, textColor, shadowColor, textShadowSize);
-        yPosition += normalFont.getSize() + padding;
+        // Draw centered title
+        g2.setFont(titleFont);
+        int titleWidth = g2.getFontMetrics().stringWidth(title);
+        int titleX = (width - titleWidth) / 2;
+        int titleY = padding + circleSize + ScalingUtil.scalePadding(25);
+        DrawingUtils.drawTextWithShadow(g2, title, titleX, titleY, titleFont, textColor, shadowColor, textShadowSize);
 
-        DrawingUtils.drawTextWithShadow(g2, "Filename: " + filename, padding, yPosition, normalFont, textColor, shadowColor, textShadowSize);
-        yPosition += normalFont.getSize() + padding;
+        // Draw author and filename inside ellipses
+        int ellipseHeight = ScalingUtil.scaleHeight(30);
+        int ellipseWidth = ScalingUtil.scaleWidth(150);
+        int ellipseSpacing = ScalingUtil.scaleWidth(20);
+        int ellipseY = titleY + ScalingUtil.scalePadding(25);
 
-        DrawingUtils.drawTextWithShadow(g2, "Title: " + title, padding, yPosition, titleFont, textColor, shadowColor, textShadowSize);
-        yPosition += titleFont.getSize() + padding;
+        // Author ellipse and text
+        int authorEllipseX = width / 2 - ellipseWidth - ellipseSpacing / 2;
+        Shape authorEllipse = new RoundRectangle2D.Float(authorEllipseX, ellipseY, 
+                ellipseWidth, ellipseHeight, ellipseHeight, ellipseHeight);
+        g2.setColor(ACCENT_COLOR);
+        g2.fill(authorEllipse);
+        g2.setFont(normalFont);
+        g2.setColor(textColor);
+        int authorTextWidth = g2.getFontMetrics().stringWidth(author);
+        int authorTextX = authorEllipseX + (ellipseWidth - authorTextWidth) / 2;
+        int textVerticalCenter = ellipseY + ellipseHeight / 2 + g2.getFontMetrics().getHeight() / 4;
+        g2.drawString(author, authorTextX, textVerticalCenter);
 
-        DrawingUtils.drawTextWithShadow(g2, "Author: " + author, padding, yPosition, normalFont, textColor, shadowColor, textShadowSize);
-        yPosition += normalFont.getSize() + padding;
-
-        // If a best fragment was provided, draw it.
-        if (bestFragment != null && !bestFragment.isEmpty()) {
-            DrawingUtils.drawTextWithShadow(g2, "Best Fragment: " + bestFragment, padding, yPosition, normalFont, textColor, shadowColor, textShadowSize);
-            yPosition += normalFont.getSize() + padding;
+        // Filename ellipse and text
+        int filenameEllipseX = width / 2 + ellipseSpacing / 2;
+        Shape filenameEllipse = new RoundRectangle2D.Float(filenameEllipseX, ellipseY, 
+                ellipseWidth, ellipseHeight, ellipseHeight, ellipseHeight);
+        g2.setColor(ACCENT_COLOR);
+        g2.fill(filenameEllipse);
+        g2.setColor(textColor);
+        String displayFilename = filename;
+        if (displayFilename.length() > 15) {
+            displayFilename = displayFilename.substring(0, 12) + "...";
         }
+        int filenameTextWidth = g2.getFontMetrics().stringWidth(displayFilename);
+        int filenameTextX = filenameEllipseX + (ellipseWidth - filenameTextWidth) / 2;
+        g2.drawString(displayFilename, filenameTextX, textVerticalCenter);
 
-        DrawingUtils.drawTextWithShadow(g2, "Score: " + score, padding, yPosition, normalFont, textColor, shadowColor, textShadowSize);
-        yPosition += normalFont.getSize() + padding;
+        // Only show additional details when hovered/expanded
+        if (showDetails) {
+            int detailsY = ellipseY + ellipseHeight + ScalingUtil.scalePadding(25);
+            DrawingUtils.drawTextWithShadow(g2, "Score: " + score, padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
+            detailsY += normalFont.getSize() + padding;
 
-        // If a full explanation exists, render it line by line.
-        if (fullExplanation != null && !fullExplanation.isEmpty()) {
-            String[] explanationLines = fullExplanation.split("\n");
-            for (String line : explanationLines) {
-                DrawingUtils.drawTextWithShadow(g2, line, padding, yPosition, normalFont, textColor, shadowColor, textShadowSize);
-                yPosition += normalFont.getSize() + ScalingUtil.scalePadding(2);
+            // Render best fragment text if provided
+            if (bestFragment != null && !bestFragment.isEmpty()) {
+                DrawingUtils.drawTextWithShadow(g2, "Best Fragment:", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
+                detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
+
+                String[] words = bestFragment.split("\\s+");
+                StringBuilder line = new StringBuilder();
+                int maxWidth = width - (padding * 2);
+                for (String word : words) {
+                    String testLine = line.toString() + (line.length() > 0 ? " " : "") + word;
+                    int testWidth = g2.getFontMetrics(normalFont).stringWidth(testLine);
+                    if (testWidth > maxWidth) {
+                        DrawingUtils.drawTextWithShadow(g2, line.toString(), padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
+                        detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
+                        line = new StringBuilder(word);
+                    } else {
+                        if (line.length() > 0) {
+                            line.append(" ");
+                        }
+                        line.append(word);
+                    }
+                }
+                if (line.length() > 0) {
+                    DrawingUtils.drawTextWithShadow(g2, line.toString(), padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
+                    detailsY += normalFont.getSize() + padding;
+                }
+            }
+
+            // Render full explanation (if available), line by line
+            if (fullExplanation != null && !fullExplanation.isEmpty()) {
+                DrawingUtils.drawTextWithShadow(g2, "Full Explanation:", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
+                detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
+                String[] explanationLines = fullExplanation.split("\n");
+                for (String line : explanationLines) {
+                    DrawingUtils.drawTextWithShadow(g2, line, padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
+                    detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
+                }
             }
         }
-
         g2.dispose();
     }
+    
+    /**
+     * Override the paint component to handle background and scrolling
+     */
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        if (showDetails) {
+            int minContentHeight = calculateMinimumContentHeight();
+            if (contentPanel.getPreferredSize().height < minContentHeight) {
+                contentPanel.setPreferredSize(new Dimension(originalSize.width, minContentHeight));
+                contentPanel.revalidate();
+            }
+        }
+    }
 }
-

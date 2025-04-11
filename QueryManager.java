@@ -24,11 +24,9 @@ import java.util.Arrays;
  * </p>
  * 
  * @version March 2025
- * @author Daniel Seredensky
+ * @author Daniel Seredensky, William, Ojo, Oliwia
  */
 public class QueryManager {
-    // Define the fields.
-
     // Fields that are not tokenized (analyzed)
     private static final Set<String> NON_ANALYZED_FIELDS = new HashSet<>(
             Arrays.asList("filename", "filepath", "modified", "author", "title")
@@ -49,7 +47,6 @@ public class QueryManager {
     // True: first-pass queries (e.g. exact match for non-analyzed fields, case-sensitive prefix for analyzed fields).
     // False: fallback queries (e.g. wildcard for non-analyzed fields, case-insensitive prefix for analyzed fields)
     private boolean isFirstQuery = true;
-    // The per-field analyzer 
     private Analyzer perFieldAnalyzer;
 
     /**
@@ -98,7 +95,6 @@ public class QueryManager {
             return;
         }
         try {
-            // Initialize the custom parser with our list of fields, the per-field analyzer, and the isFirstQuery flag.
             MyQueryParser parser = new MyQueryParser(ALL_FIELDS, perFieldAnalyzer, isFirstQuery, NON_ANALYZED_FIELDS);
             // Parse the query. The parser will handle Boolean operators and fielded syntax.
             builtQuery = parser.parse(searchQuery);

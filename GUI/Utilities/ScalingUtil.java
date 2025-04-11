@@ -11,8 +11,8 @@ import java.awt.Window;
  */
 public class ScalingUtil {
     // Reference resolution (MacBook Pro 13.3-inch)
-    private static final int REFERENCE_WIDTH = 2560;
-    private static final int REFERENCE_HEIGHT = 1600;
+    private static final int REFERENCE_WIDTH = 1680;
+    private static final int REFERENCE_HEIGHT = 1050;
     
     // Current screen resolution
     private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -24,6 +24,9 @@ public class ScalingUtil {
     // Reference frame sizes for dynamic component scaling
     private static final int MIN_FRAME_WIDTH = 800;
     private static final int MIN_FRAME_HEIGHT = 600;
+    static {
+        System.out.println(HORIZONTAL_SCALE + " " + VERTICAL_SCALE);
+    }
     
     /**
      * Scales a width value based on the current screen resolution.

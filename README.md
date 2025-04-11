@@ -51,7 +51,6 @@ flowchart TD
     QM --> MP
     QM --> LS
     LS --> R
-
 ```
 
 # GUI
@@ -70,7 +69,8 @@ GUI/
 │   ├── CustomTextField.java     // Text field with custom styling to blend into the JPanel (SearchBar.java)
 │   ├── ModernButton.java        // Button designed to look like a SwiftUI rounded button
 │   ├── Menu.java                // Settings menu (**not implemented**)
-│   ├── Title.java               // Custom formatted title component
+│   ├── Title.java               // Custom formatted title component (**not used**)
+│   ├── Result               // Custom formatted title component (**not used**)
 │   └── ResultsComponent.java    // Displays search results in a scrollable panel (**not implemented**)
 │   GUIProgression/              // Progression classes for GUI
 │       └── BaseGUI.java         // Base abstract class for main JFrame handles setup
@@ -78,48 +78,4 @@ GUI/
 │   └── flatlaf.jar
 │   └── **Lucene jars**
 ├── **Rest of files**
-```
-
-```mermaid
-flowchart TD
-    A["GUI/"]
-    B["GUI.java (Main JFrame, not implemented)"]
-    C["backend/"]
-    D["AllenIverson.java (Coordinates search operations and file I/O, not implemented)"]
-    E["Utilities/"]
-    F["ScalingUtil.java (Scales components for dynamic geometry)"]
-    G["DrawingUtils.java (Draws shadows and hover effects)"]
-    H["components/"]
-    I["SearchBar.java (Custom search bar component)"]
-    J["SearchButton.java (Search button component)"]
-    K["CustomTextField.java (Styled text field for SearchBar)"]
-    L["ModernButton.java (SwiftUI-like rounded button)"]
-    M["Menu.java (Settings menu, not implemented)"]
-    N["Title.java (Custom formatted title component)"]
-    O["ResultsComponent.java (Displays search results in a scrollable panel, not implemented)"]
-    P["GUIProgression/"]
-    Q["BaseGUI.java (Abstract class for main JFrame setup)"]
-    R["jars/"]
-    S["flatlaf.jar"]
-    T["Lucene jars"]
-
-    A --> B
-    A --> C
-    C --> D
-    C --> E
-    E --> F
-    E --> G
-    A --> H
-    H --> I
-    H --> J
-    H --> K
-    H --> L
-    H --> M
-    H --> N
-    H --> O
-    A --> P
-    P --> Q
-    A --> R
-    R --> S
-    R --> T
 ```
