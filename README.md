@@ -33,8 +33,6 @@ javac -cp "jars/*:." src/*.java GUI/*/*.java
 
 ```zsh
 java -cp "jars/*:." src.Main -kwarg1 value1 -kwarg2 value2
-# test the GUI
-java -cp "jars/*:." GUI/ComponentTest.java
 ```
 
 # Search Logic 
