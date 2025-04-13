@@ -16,7 +16,7 @@
 
 ```zsh
 # compiles the java files in the main dir, and the GUI files 
-javac -cp "jars/*:." *.java GUI/*.java GUI/*/*.java
+javac -cp "jars/*:." src/*.java GUI/*/*.java
 ```
 
 ## Run 
@@ -32,7 +32,7 @@ javac -cp "jars/*:." *.java GUI/*.java GUI/*/*.java
 - ***missing*** boolean flag to only index missing documents
 
 ```zsh
-java -cp "jars/*:." FinalProjMain -kwarg1 value1 -kwarg2 value2
+java -cp "jars/*:." src.Main -kwarg1 value1 -kwarg2 value2
 # test the GUI
 java -cp "jars/*:." GUI/ComponentTest.java
 ```
@@ -57,9 +57,7 @@ flowchart TD
 
 ```plaintext
 GUI/
-├── GUI.java                     // Main JFrame (**currently aliased as ComponentTest.java**)
-├── backend/                     // Backend classes for GUI
-│   └── AllenIverson.java        // Coordinates search operations and file I/O (**not implemented**)
+├── GUI.java                     // Main JFrame (**not implemented**)
 │   Utilities/                   // Utility classes for GUI
 │   └── ScalingUtil.java         // Utility class for scaling components to get a basic version of Swifts dynamic geometry
 │   └── DrawingUtils.java        // Utility class for drawing shadows and hover effects
@@ -74,6 +72,8 @@ GUI/
 │   ├── ResultCard.java          // Handles the design of the result card, scrollable panel, and hover effect for the scroll bar
 │   └── ResultsPanel.java        // Displays search results in a scrollable panel 
 │   GUIProgression/              // Progression classes for GUI
+│   ├── SearcherUI.java          // Handles the integration of the searcher handlers and the results layout
+│   ├── ComponentLayout.java     // Handles the default layout of the GUI
 │   └── BaseGUI.java             // Base abstract class for main JFrame handles setup
 ├── jars/                        // External libraries 
 │   └── flatlaf.jar              // FlatLaf look and feel for GUI

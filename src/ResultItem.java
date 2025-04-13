@@ -1,3 +1,4 @@
+package src;
 /**
  * ResultItem represents a single search result.
  * 

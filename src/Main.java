@@ -1,11 +1,14 @@
+package src;
 import java.io.File;
+import javax.swing.SwingUtilities;
+import GUI.GUIProgression.SearcherUI;
 
 /**
  * Main Controller for the Final Project
  * @author Daniel Seredensky, Oliwia, Ojo
  * @version March 25
  */
-public class FinalProjMain {
+public class Main {
 
     /**
      * Main method for Final Project accepts command-line arguments.
@@ -111,7 +114,12 @@ public class FinalProjMain {
         
         // Launch GUI 
         if (launchGUI) {
-            System.out.println("Launching GUI... (not implemented)");
+            final String indexPathFinal = indexPath;
+            final boolean explainFinal = explain;
+            SwingUtilities.invokeLater(() -> {
+                SearcherUI ui = new SearcherUI("title",indexPathFinal, explainFinal, maxResults);
+                ui.setVisible(true);
+            });
         } else {
             try {
                 SearchManager sm = new SearchManager(indexPath, explain, maxResults);

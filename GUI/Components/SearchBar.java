@@ -25,7 +25,7 @@ import javax.swing.SwingUtilities;
 public class SearchBar extends JPanel {
     private final JTextField textField;
     private final SearchButton searchButton;
-    private final ModernButton helpButton;
+    private final ModernButton indexStatsButton;
     private final ModernButton settingsButton;
     private final double ratio = 1.125;
 
@@ -44,8 +44,8 @@ public class SearchBar extends JPanel {
     private final int MAX_USABLE_WIDTH = (int)(590 * ratio);
     private final int MAX_TEXT_FIELD_HEIGHT = (int)(60 * ratio);
     private final int MAX_SEARCH_BUTTON_SIZE = (int)(50 * ratio);
-    private final int MAX_BUTTON_WIDTH = (int)(100 * ratio);
-    private final int MAX_BUTTON_HEIGHT = (int)(35 * ratio);
+    private final int MAX_BUTTON_WIDTH = (int)(140 * ratio);
+    private final int MAX_BUTTON_HEIGHT = (int)(45 * ratio);
 
     // Minimum size values (for 800x600 frame)
     private final int MIN_WIDTH = (int)(400 * ratio);
@@ -53,8 +53,8 @@ public class SearchBar extends JPanel {
     private final int MIN_USABLE_WIDTH = (int)(350 * ratio);
     private final int MIN_TEXT_FIELD_HEIGHT = (int)(60 * ratio);
     private final int MIN_SEARCH_BUTTON_SIZE = (int)(40 * ratio);
-    private final int MIN_BUTTON_WIDTH = (int)(80 * ratio);
-    private final int MIN_BUTTON_HEIGHT = (int)(30 * ratio);
+    private final int MIN_BUTTON_WIDTH = (int)(110 * ratio);
+    private final int MIN_BUTTON_HEIGHT = (int)(35 * ratio);
 
     
     // Current size values
@@ -74,14 +74,14 @@ public class SearchBar extends JPanel {
         
         searchButton = new SearchButton();
         
-        helpButton = new ModernButton(MAX_BUTTON_WIDTH, MAX_BUTTON_HEIGHT, "Help");
+        indexStatsButton = new ModernButton(MAX_BUTTON_WIDTH + ScalingUtil.scaleWidth(20), MAX_BUTTON_HEIGHT + ScalingUtil.scaleHeight(10), "Indexing Statistics");
         settingsButton = new ModernButton(MAX_BUTTON_WIDTH, MAX_BUTTON_HEIGHT, "Settings");
 
         customizeInternalButtons();
 
         add(textField);
         add(searchButton);
-        add(helpButton);
+        add(indexStatsButton);
         add(settingsButton);
 
         layoutComponentsWithPadding();
@@ -181,7 +181,7 @@ public class SearchBar extends JPanel {
         );
         
         // Help button positioning
-        helpButton.setBounds(
+        indexStatsButton.setBounds(
             PANEL_PADDING, 
             PANEL_PADDING + currentTextFieldHeight + COMPONENT_SPACING, 
             currentButtonWidth, 
@@ -196,7 +196,7 @@ public class SearchBar extends JPanel {
             currentButtonHeight
         );
         
-        helpButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
+        indexStatsButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
         settingsButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
     }
 
@@ -204,7 +204,7 @@ public class SearchBar extends JPanel {
      * Customize internal buttons to match the panel's aesthetic
      */
     private void customizeInternalButtons() {
-        helpButton.setBackground(BACKGROUND_COLOR);
+        indexStatsButton.setBackground(BACKGROUND_COLOR);
         settingsButton.setBackground(BACKGROUND_COLOR);
     }
 
@@ -242,8 +242,8 @@ public class SearchBar extends JPanel {
         return searchButton;
     }
 
-    public ModernButton getHelpButton() {
-        return helpButton;
+    public ModernButton getIndexStatsButton() {
+        return indexStatsButton;
     }
 
     public ModernButton getSettingsButton() {

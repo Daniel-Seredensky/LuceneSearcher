@@ -42,6 +42,8 @@ public class ModernButton extends JButton {
     public ModernButton(int width, int height, String text) {
         super(text);
         setPreferredSize(new Dimension(width + shadowSize, height + shadowSize));
+        setMinimumSize(new Dimension(width + shadowSize, height + shadowSize));
+        setMaximumSize(new Dimension(width + shadowSize, height + shadowSize));
 
         // Set up button appearance
         setFocusPainted(false);

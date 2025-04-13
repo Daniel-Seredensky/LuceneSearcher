@@ -1,3 +1,4 @@
+package src;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TopDocs;
@@ -22,6 +23,7 @@ public class LuceneSearcher {
     private IndexSearcher searcher;
     private int maxResults;
     private String indexDirPath;
+    public boolean isOpen;
     public static final LuceneSearcher shared = new LuceneSearcher();
 
     /**
@@ -61,6 +63,7 @@ public class LuceneSearcher {
         if (indexDirectory != null) {
             indexDirectory.close();
         }
+        this.isOpen = false;
     }
 
     /**
@@ -73,6 +76,7 @@ public class LuceneSearcher {
         this.indexReader = DirectoryReader.open(indexDirectory);
         this.searcher = new IndexSearcher(indexReader);
         searcher.setSimilarity(new ClassicSimilarity()); // TF-IDF scoring instead of BM25 
+        this.isOpen = true;
     }
 
     /**

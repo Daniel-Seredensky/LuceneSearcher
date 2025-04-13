@@ -31,8 +31,8 @@ public class BaseResultCard extends JPanel {
     protected int targetHeight = COLLAPSED_HEIGHT;
     protected int currentHeight = COLLAPSED_HEIGHT;
     protected Timer animationTimer;
-    protected final int ANIMATION_DURATION = 200; // milliseconds
-    protected final int ANIMATION_STEPS = 20;
+    protected final int ANIMATION_DURATION = 500; // milliseconds
+    protected final int ANIMATION_STEPS = 50;
     protected int animationStep = 0;
     protected Dimension originalSize = new Dimension(ScalingUtil.scaleWidth(1000), COLLAPSED_HEIGHT);
 
@@ -51,7 +51,6 @@ public class BaseResultCard extends JPanel {
                 ScalingUtil.scaleHeight(curSize.height - 50)));
         setMaximumSize(new Dimension(ScalingUtil.scaleWidth(curSize.width),
                 ScalingUtil.scaleHeight(curSize.height + 50)));
-
         setOpaque(false);
 
         // Set up mouse listeners for hover effect and animation trigger

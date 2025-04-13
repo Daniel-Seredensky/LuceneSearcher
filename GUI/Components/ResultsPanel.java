@@ -69,23 +69,19 @@ public class ResultsPanel extends JPanel {
         // default to no results found
         if (results == null || results.isEmpty()) {
             ResultCard noResultCard = new ResultCard("Result Number: 0\nFilename: No Results\nTitle: No search results found\nAuthor: System");
-            noResultCard.setAlignmentX(LEFT_ALIGNMENT);
+            noResultCard.setAlignmentX(CENTER_ALIGNMENT);
             cardsContainer.add(noResultCard);
             return;
         }
         
-        // Iterate in reverse order so that the first result is at the bottom
-        for (int i = results.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < results.size(); i++) {
             String resultString = results.get(i);
             ResultCard card = new ResultCard(resultString);
             
             card.setAlignmentX(CENTER_ALIGNMENT);
             cardsContainer.add(card);
-            
-            // Only add vertical spacing if there will be another card above
-            if (i != 0) {
-                cardsContainer.add(Box.createVerticalStrut(ScalingUtil.scalePadding(40)));
-            }
+        
+            cardsContainer.add(Box.createVerticalStrut(ScalingUtil.scalePadding(40)));
         }
     }    
     

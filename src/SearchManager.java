@@ -1,3 +1,5 @@
+package src;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Query;
@@ -30,8 +32,8 @@ public class SearchManager {
     private boolean explain;
     private int MAX_RESULTS;
     private boolean isLenientQuery;
-    private QueryManager queryManager;
-    private LuceneSearcher luceneSearcher;
+    public QueryManager queryManager;
+    public LuceneSearcher luceneSearcher;
 
     /**
      * Constructs a SearchManager.
@@ -56,7 +58,6 @@ public class SearchManager {
         } catch (IOException e) {
             System.out.println("Error opening index directory: " + indexDirPath);
             e.printStackTrace();
-
         }
     }
 
@@ -73,6 +74,10 @@ public class SearchManager {
     public void setMaxResults(int maxResults) {
         this.MAX_RESULTS = maxResults;
         this.luceneSearcher.setMaxResults(maxResults);
+    }
+
+    public void setIsLenientQuery(boolean isLenientQuery) {
+        this.isLenientQuery = isLenientQuery;
     }
 
     /**
@@ -98,7 +103,7 @@ public class SearchManager {
             try {
                 String result = searchIndex(searchQuery);
                 System.out.println(result);
-            } catch (IOException | ParseException | InvalidTokenOffsetsException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -126,14 +131,16 @@ public class SearchManager {
      * @throws ParseException
      * @throws InvalidTokenOffsetsException
      */
-    public String searchIndex(String searchQuery) throws IOException, ParseException, InvalidTokenOffsetsException {
+    public String searchIndex(String searchQuery) throws IOException {
         // Initialize QueryManager with the user's query.
         if (searchQuery.equals("*help*")) {
-            return "Valid queries are of the form: <field>:<value>, <field>:<value> AND <field>:<value>, \"<value>\" for literal searches, or <value> (default search includes all fields).";
+            System.out.println("Valid queries are of the form: <field>:<value>, <field>:<value> AND <field>:<value>, \"<value>\" for literal searches, or <value> (default search includes all fields).");
+            return "";
         }
         if (searchQuery.equals("*ChangeMode*")) {
             isLenientQuery = !isLenientQuery;
-            return isLenientQuery ? "Wild card search mode enabled for non analyzed fields." : "Wild card search mode disabled.";
+            System.out.println("Wild card search mode is now " + (isLenientQuery ? "enabled" : "disabled") + " for non analyzed fields.");
+            return "";
         }
 
         queryManager.setQueryMode(!isLenientQuery);
@@ -143,7 +150,8 @@ public class SearchManager {
         System.out.println("");// new line because it looks better
         System.out.println("Query field's used: "+ queryManager.findRequestedFields());
         if (!queryManager.isValid()) {
-            return "Invalid query. Enter *help* for guidance on valid queries.";
+            System.out.println("Invalid query. Enter *help* for guidance on valid queries.");
+            return "";
         }
         // Retrieve the built Lucene Query 
         Query query = queryManager.getBuiltQuery();
@@ -157,8 +165,12 @@ public class SearchManager {
         TopDocs topDocs = luceneSearcher.search(query);
 
         // Process the TopDocs and build a formatted results output string
-        Results resultsOutput = Results.fromTopDocs(luceneSearcher.getIndexSearcher(), query, topDocs, queryManager.getPerFieldAnalyzer(), requestedFields, explain);
-        
-        return resultsOutput.getTotalHits() != 0 ? resultsOutput.toString() : "No results found.";
+        try {
+            Results resultsOutput = Results.fromTopDocs(luceneSearcher.getIndexSearcher(), query, topDocs, queryManager.getPerFieldAnalyzer(), requestedFields, explain);
+            return resultsOutput.getTotalHits() != 0 ? resultsOutput.toString() : "No results found.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "No results found.";
+        }
     }
 }

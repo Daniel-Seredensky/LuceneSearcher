@@ -183,7 +183,6 @@ public class ResultCard extends BaseResultCard {
                                     backgroundColor.getBlue(), 150); // Slight transparency
         g2.setColor(backgroundColor);
         g2.fill(cardShape);
-
         // Setup font and padding parameters
         int padding = ScalingUtil.scalePadding(25);
         Font titleFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleWidth(22));
@@ -295,7 +294,6 @@ public class ResultCard extends BaseResultCard {
         }
         g2.dispose();
     }
-    
     /**
      * Override the paint component to handle background and scrolling
      */
