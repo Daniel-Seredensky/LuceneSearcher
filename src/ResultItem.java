@@ -10,6 +10,8 @@ class ResultItem {
     private String author;
     private String output; // Formatted output string including mandatory fields and best fragment.
     private float score;
+    private boolean hasExplanation;
+    private String explanation;
 
     public ResultItem(String filename, String title, String author, String output, float score) {
         this.filename = filename;
@@ -18,7 +20,24 @@ class ResultItem {
         this.output = output;
         this.score = score;
     }
+    public ResultItem(String filename, String title, String author, String output, float score, String explanation) {
+        this.filename = filename;
+        this.title = title;
+        this.author = author;
+        this.output = output;
+        this.score = score;
+        this.hasExplanation = true;
+        this.explanation = explanation;
+    }
 
+    public boolean hasExplanation() {
+        return hasExplanation;
+    }
+
+    public String getExplanation() {
+        return explanation;
+    }
+    
     public String getFilename() {
         return filename;
     }

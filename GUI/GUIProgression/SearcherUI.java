@@ -2,6 +2,7 @@ package GUI.GUIProgression;
 
 import src.SearchManager; 
 import GUI.Components.ResultsPanel;
+import GUI.Components.CustomTextField;
 import GUI.Utilities.ScalingUtil;
 
 import javax.swing.*;
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 public class SearcherUI extends ComponentLayout {
 
     private SearchManager searchManager;
-    private boolean hasCurrentResults = false;           // tracks if there is current results
     private ArrayList<String> results;                   // holds the result strings
     private ResultsPanel resultsPanel;
+
 
     /**
      * Constructor that also initializes the SearchManager with given parameters.
@@ -98,11 +99,41 @@ public class SearcherUI extends ComponentLayout {
                     ex.printStackTrace();
                 }
             }
-            System.out.println("Search button pressed");
-            // Grab the text from the search bar
+
+            CustomTextField maxResultsField = searchBar.getMaxResults();
+            String maxResultsString = maxResultsField.getText();
+            maxResultsField.setText("");
+            if (maxResultsString.isEmpty()){
+                maxResultsString = "5";
+            }
+            int maxResultsNumber;
+            try {
+                maxResultsNumber = Integer.parseInt(maxResultsString);
+            } catch (NumberFormatException ex) {
+                maxResultsString = "5";
+                maxResultsNumber = 5;
+            }
+
+            maxResultsField.setPrompt(maxResultsString);
+            searchManager.setMaxResults(maxResultsNumber);
+            searchManager.setExplain(searchBar.getExplainButton().getState());
+
             String query = searchBar.getTextField().getText();
-            System.out.println("Query: " + query);
-            
+
+            ArrayList<Object> fields = new ArrayList<>(searchBar.getComboBox().getSelectedItems());
+            query = fields.contains("Literal Search") ? "\"" + query + "\"" : query;
+
+            String finalQuery = "";
+            // Add the fields to the query
+            for (int i = 0; i < fields.size(); i++) {
+                if (fields.get(i).equals("Literal Search")) continue;
+                boolean isNextOutOfBounds = i + 1 >= fields.size();
+                finalQuery += isNextOutOfBounds ? fields.get(i) + ": " + query : fields.get(i) + ": " + query + " AND ";
+            }
+            query = finalQuery.isEmpty() ? query : finalQuery;
+
+            System.out.println("Final Query: " + query);
+
             // Execute the search and store results
             try{
                 String resultString = searchManager.searchIndex(query);
@@ -111,7 +142,6 @@ public class SearcherUI extends ComponentLayout {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            hasCurrentResults = true;
             isShowingResults = true; // triggers the "results" layout
             try{
                 searchManager.luceneSearcher.close();
@@ -144,7 +174,6 @@ public class SearcherUI extends ComponentLayout {
         String[] splitBlocks = rawResult.split("(?=Result Number: \\d+)");
 
         for (String block : splitBlocks) {
-            // Clean up the block (trim whitespace, etc.)
             block = block.trim();
             // Skip empty pieces (in case there's leading/trailing newlines)
             if (!block.isEmpty()) {

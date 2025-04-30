@@ -1,7 +1,12 @@
 package GUI.Components;
 
+import GUI.Components.CustomTextField;
 import GUI.Utilities.DrawingUtils;
 import GUI.Utilities.ScalingUtil;
+import raven.combobox.CustomComboBoxMultiSelection;
+import src.QueryManager;
+
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.AncestorEvent;
@@ -16,17 +21,26 @@ import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.RoundRectangle2D;
+import java.util.Arrays;
+import java.util.stream.Stream;
 import javax.swing.SwingUtilities;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import javax.swing.UIManager;
+import java.awt.Font;
 
 /**
  * A unified search bar with integrated components and a modern design.
  * Dynamically resizes based on the parent frame's size.
  */
 public class SearchBar extends JPanel {
-    private final JTextField textField;
+    private final CustomTextField textField;
     private final SearchButton searchButton;
     private final ModernButton indexStatsButton;
-    private final ModernButton settingsButton;
+    private final ModernButtonBoolean explainButton;
+    private final CustomTextField maxResults;
+    private final CustomComboBoxMultiSelection<String> comboBox;
     private final double ratio = 1.125;
 
     private final int arcRadius = (int)(30 * ratio);
@@ -41,20 +55,24 @@ public class SearchBar extends JPanel {
     // Maximum size values (for fullscreen)
     private final int MAX_WIDTH = (int)(600 * ratio);
     private final int MAX_HEIGHT = (int)(100 * ratio);
-    private final int MAX_USABLE_WIDTH = (int)(590 * ratio);
+    private final int MAX_USABLE_WIDTH = (int)(600 * ratio);
     private final int MAX_TEXT_FIELD_HEIGHT = (int)(60 * ratio);
     private final int MAX_SEARCH_BUTTON_SIZE = (int)(50 * ratio);
     private final int MAX_BUTTON_WIDTH = (int)(140 * ratio);
     private final int MAX_BUTTON_HEIGHT = (int)(45 * ratio);
+    private final int MAX_COMBOBOX_WIDTH = (int)(175 * ratio);
+    private final int MAX_COMBOBOX_HEIGHT = (int)(35 * ratio);
 
     // Minimum size values (for 800x600 frame)
-    private final int MIN_WIDTH = (int)(400 * ratio);
+    private final int MIN_WIDTH = (int)(550 * ratio);
     private final int MIN_HEIGHT = (int)(70 * ratio);
-    private final int MIN_USABLE_WIDTH = (int)(350 * ratio);
+    private final int MIN_USABLE_WIDTH = (int)(550 * ratio);
     private final int MIN_TEXT_FIELD_HEIGHT = (int)(60 * ratio);
     private final int MIN_SEARCH_BUTTON_SIZE = (int)(40 * ratio);
     private final int MIN_BUTTON_WIDTH = (int)(110 * ratio);
     private final int MIN_BUTTON_HEIGHT = (int)(35 * ratio);
+    private final int MIN_COMBOBOX_WIDTH = (int)(150 * ratio);
+    private final int MIN_COMBOBOX_HEIGHT = (int)(30 * ratio);
 
     
     // Current size values
@@ -65,30 +83,57 @@ public class SearchBar extends JPanel {
     private int currentSearchButtonSize = MAX_SEARCH_BUTTON_SIZE;
     private int currentButtonWidth = MAX_BUTTON_WIDTH;
     private int currentButtonHeight = MAX_BUTTON_HEIGHT;
+    private int currentComboBoxWidth = MAX_COMBOBOX_WIDTH;
+    private int currentComboBoxHeight = MAX_COMBOBOX_HEIGHT;
+    private Dimension MAXRESULTS_SIZE = new Dimension(ScalingUtil.scaleWidth(60), ScalingUtil.scaleHeight(35));
 
     public SearchBar() {
+        initFlatlafForComboBox();
         setLayout(null);
         setOpaque(false);
 
         textField = new CustomTextField();
+        maxResults = new CustomTextField();
+        maxResults.setPrompt("5");
         
         searchButton = new SearchButton();
-        
+
+        comboBox = new CustomComboBoxMultiSelection<>();
+        setData(comboBox);
+
         indexStatsButton = new ModernButton(MAX_BUTTON_WIDTH + ScalingUtil.scaleWidth(20), MAX_BUTTON_HEIGHT + ScalingUtil.scaleHeight(10), "Indexing Statistics");
-        settingsButton = new ModernButton(MAX_BUTTON_WIDTH, MAX_BUTTON_HEIGHT, "Settings");
+        explainButton = new ModernButtonBoolean(MAX_BUTTON_WIDTH, MAX_BUTTON_HEIGHT, "Explain");
 
         customizeInternalButtons();
 
         add(textField);
         add(searchButton);
         add(indexStatsButton);
-        add(settingsButton);
+        add(explainButton);
+        add(comboBox);
+        add(maxResults);
 
         layoutComponentsWithPadding();
 
         updatePreferredSize();
         
         setupResizeListeners();
+    }
+
+    public void initFlatlafForComboBox() {
+        // Set the custom font for the combo box
+        FlatMacDarkLaf.setup();
+        FlatRobotoFont.install();
+        UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
+        FlatLaf.registerCustomDefaultsSource("raven.combobox");
+        UIManager.put("ComboBox.background", new Color(0x4D483D));       // PUNGA for primary background
+        UIManager.put("ComboBox.foreground", new Color(0xDDE0D4));       // FETA for primary text/foreground
+        UIManager.put("ComboBox.editableBackground", new Color(0x4D483D)); // Ensure editable areas match the background
+        UIManager.put("ComboBox.buttonArrowColor", new Color(0x5E6C5E));  // FIN_LANDIA for the drop-down arrow
+        UIManager.put("ComboBox.borderColor", new Color(0x5E6C5E));       // FIN_LANDIA for standard border
+        UIManager.put("ComboBox.focusedBorderColor", new Color(0x5E6C5E));  // FIN_LANDIA for the focused/hover border
+        UIManager.put("ComboBox.hoverBorderColor", new Color(0x5E6C5E)); 
+        FlatLaf.updateUI();
     }
     
     /**
@@ -140,7 +185,9 @@ public class SearchBar extends JPanel {
         currentSearchButtonSize = ScalingUtil.calculateScaledValue(MIN_SEARCH_BUTTON_SIZE, MAX_SEARCH_BUTTON_SIZE, ratio);
         currentButtonWidth = ScalingUtil.calculateScaledValue(MIN_BUTTON_WIDTH, MAX_BUTTON_WIDTH, ratio);
         currentButtonHeight = ScalingUtil.calculateScaledValue(MIN_BUTTON_HEIGHT, MAX_BUTTON_HEIGHT, ratio);
-        
+        currentComboBoxWidth = ScalingUtil.calculateScaledValue(MIN_COMBOBOX_WIDTH, MAX_COMBOBOX_WIDTH, ratio);
+        currentComboBoxHeight = ScalingUtil.calculateScaledValue(MIN_COMBOBOX_HEIGHT, MAX_COMBOBOX_HEIGHT, ratio);
+
         // Update the component size and layout
         updatePreferredSize();
         layoutComponentsWithPadding();
@@ -189,15 +236,38 @@ public class SearchBar extends JPanel {
         );
         
         // Settings button positioning 
-        settingsButton.setBounds(
+        explainButton.setBounds(
             PANEL_PADDING + currentButtonWidth + COMPONENT_SPACING, 
             PANEL_PADDING + currentTextFieldHeight + COMPONENT_SPACING, 
             currentButtonWidth, 
             currentButtonHeight
         );
-        
+
+        // ComboBox positioning
+        comboBox.setBounds(
+            PANEL_PADDING + ((currentButtonWidth + COMPONENT_SPACING) * 2),
+            PANEL_PADDING + currentTextFieldHeight + COMPONENT_SPACING + ((currentButtonHeight - currentComboBoxHeight)/2) - ScalingUtil.scalePadding(10)/2, // Center vertically relative to the button position while accounting for button shadow
+            currentComboBoxWidth,
+            currentComboBoxHeight 
+        );
+
+        // Max Results positioning 
+        maxResults.setBounds(
+            PANEL_PADDING + currentUsableWidth - currentSearchButtonSize, 
+            PANEL_PADDING + currentSearchButtonSize + COMPONENT_SPACING + ((currentButtonHeight - MAXRESULTS_SIZE.height)/2), // center vertically relative to the button position
+            MAXRESULTS_SIZE.width,
+            MAXRESULTS_SIZE.height
+        );
+
+        comboBox.setPreferredSize(new Dimension(currentComboBoxWidth, currentComboBoxHeight));
+        comboBox.setMaximumSize(new Dimension(currentComboBoxWidth, currentComboBoxHeight));
+        comboBox.setMinimumSize(new Dimension(currentComboBoxWidth, currentComboBoxHeight));
+        maxResults.setPreferredSize(MAXRESULTS_SIZE);
+        maxResults.setMaximumSize(MAXRESULTS_SIZE);
+        maxResults.setMinimumSize(MAXRESULTS_SIZE);
+
         indexStatsButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
-        settingsButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
+        explainButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
     }
 
     /**
@@ -205,7 +275,7 @@ public class SearchBar extends JPanel {
      */
     private void customizeInternalButtons() {
         indexStatsButton.setBackground(BACKGROUND_COLOR);
-        settingsButton.setBackground(BACKGROUND_COLOR);
+        explainButton.setBackground(BACKGROUND_COLOR);
     }
 
     @Override
@@ -234,8 +304,12 @@ public class SearchBar extends JPanel {
     }
 
     // Getter methods for implementing additional handlers
-    public JTextField getTextField() {
+    public CustomTextField getTextField() {
         return textField;
+    }
+    
+    public CustomTextField getMaxResults() {
+        return maxResults;
     }
 
     public SearchButton getSearchButton() {
@@ -246,7 +320,26 @@ public class SearchBar extends JPanel {
         return indexStatsButton;
     }
 
-    public ModernButton getSettingsButton() {
-        return settingsButton;
+    public ModernButtonBoolean getExplainButton() {
+        return explainButton;
+    }
+
+    public CustomComboBoxMultiSelection<String> getComboBox() {
+        return comboBox;
+    }
+
+    private void setData(JComboBox<String> combo) {
+        combo.setModel(new javax.swing.DefaultComboBoxModel<String>(
+            combineArrays(
+                new String[]{"Literal Search"},
+                QueryManager.ALL_FIELDS
+                )
+            )
+        );
+    }
+
+    public static String[] combineArrays(String[] array1, String[] array2) {
+        return Stream.concat(Arrays.stream(array1), Arrays.stream(array2))
+                    .toArray(String[]::new);
     }
 }

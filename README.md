@@ -8,34 +8,98 @@
 - *indexCranfield* directory contains the indexed cranfield data 
 - *cranfieldSeparated* directory contains the cranfield data separated into individual files
 
-# How to run
+## 1 How to run
 
-## Compilation 
+### 1.1 Compilation 
 
 - ***note*** I use zsh for my terminal
 
 ```zsh
 # compiles the java files in the main dir, and the GUI files 
-javac -cp "jars/*:." src/*.java GUI/*/*.java
+javac -cp "jars/*:." src/*.java src/Indexers/*.java GUI/*/*.java raven/combobox/*.java
 ```
 
-## Run 
+### 1.2 Run 
 
-### **KWARGS**
+#### 1.2.1 **KWARGS**
 - ***explain*** boolean flag for the lucene explanation to be shown in the result (no value needed)
-- ***text*** boolean flag for the CLI to be shown instead of the GUI (no value needed) [**GUI not implemented**]
+- ***text*** boolean flag for the CLI to be shown instead of the GUI (no value needed) 
 - ***index*** String for the specific index directory to be used
 - ***data***  String for the specific data directory to be used
-- ***parallel*** boolean flag for the indexing and search parseing to be run in parallel (no value needed) [**not implemented**]
-- ***new*** boolean flag to only index new documents
-- ***changed*** boolean flag to only index changed documents
-- ***missing*** boolean flag to only index missing documents
+- ***parallel*** boolean flag for the indexing and search parseing to be run in parallel (no value needed) 
+- ***batch*** boolean flag for the indexing and search parseing to be run in batch mode (no value needed) 
+- ***new*** boolean flag to only index new documents (no value needed)
+- ***changed*** boolean flag to only index changed documents (no value needed)
+- ***missing*** boolean flag to only index missing documents (no value needed)
+
+> **Note:** 
+> The **parallel** and **batch** flags are mutually exclusive.
+> The **new**, **changed**, and **missing** flags are mutually exclusive.
 
 ```zsh
 java -cp "jars/*:." src.Main -kwarg1 value1 -kwarg2 value2
 ```
 
-# Search Logic 
+## 2 File Structure
+
+``` plaintext
+DataVisualization/               // Used for visualization of indexer data
+GUI/
+├── GUI.java                     // Main JFrame (**not implemented**)
+│   Utilities/                   // Utility classes for GUI
+│   └── ScalingUtil.java         // Utility class for scaling components to get a basic version of Swifts dynamic geometry
+│   └── DrawingUtils.java        // Utility class for drawing shadows and hover effects
+├── components/                  // Custom components for GUI
+│   ├── SearchBar.java           // Custom search bar component 
+│   ├── SearchButton.java        // Search button component
+│   ├── CustomTextField.java     // Text field with custom styling to blend into the JPanel (SearchBar.java)
+│   ├── ModernButton.java        // Button designed to look like a SwiftUI rounded button
+│   ├── Menu.java                // Settings menu (**not implemented**)
+│   ├── Title.java               // Custom formatted title component (**not used**)
+│   ├── BaseResultCard.java      // Sets up the result card colors, hover animation, and parses the result text
+│   ├── ResultCard.java          // Handles the design of the result card, scrollable panel, and hover effects
+│   └── ResultsPanel.java        // Displays search results in a scrollable panel 
+├── GUIProgression/              // Progression classes for GUI
+│   ├── SearcherUI.java          // Handles the integration of the searcher handlers and the results layout
+│   ├── ComponentLayout.java     // Handles the default layout of the GUI
+│   └── BaseGUI.java             // Base abstract class for main JFrame handles setup
+jars/                            // External libraries 
+├── **flatlaf jars**             // FlatLaf look and feel for GUI and for Raven Component
+├── **Lucene jars** 
+src/
+├── Indexers/                    // Different types of indexers for results on poster
+│   ├── TextFileIndexer.java     // Base text file indexer
+│   ├── TextFileIndexerParallel.java // Parallel version of the text file indexer (using streams)
+│   ├── TextIndexingHelper.java      // Helper class for shared methods between indexers
+│   └── TextFileIndexerPBatch.java   // Each thread takes a small batch instead of a single document reducing overhead 
+├── Main.java                    // Entry point for the program, mostly a delegate
+├── CranfieldCleaner.java        // Cleans cranfield/cranfieldData.txt into documents cranfieldSeparated
+├── MyQueryParser.java           // Custom multi-field query parser to handle non-analyzed fields
+├── MyQueryManager.java          // Handles building validating,building, and holds relevant query information/variables
+├── LuceneSearcher.java          // Simple class to avoid duplicate code and seperation of concerns
+├── ResultItem.java              // Simple data structure to hold the results
+├── Results.java                 // Parses topDocs and returns an array of ResultItems
+├── SearchManager.java           // Coordinates overall search logic
+IndexExistsProctor.java          // see below |
+IndexNotExistsProctor.java       //           V
+data/
+├── *The Gutenburg data*   
+cranfield/
+├── *The Cranfield data*     
+cranfieldSeparated/
+├── *The Separated Cranfield data*
+indexCranfield/
+├── *The Indexed Cranfield directory*
+indexData/
+├── *The Indexed data directory*
+cranfield/
+├── *The Cranfield data*
+raven/combobox
+├── *The combobox created by Raven* see README inside this pwd for more info
+└── CustomComboBoxMultiSelection.java
+```
+
+> Flowchart of the search flow
 
 ```mermaid 
 flowchart TD
@@ -50,31 +114,36 @@ flowchart TD
     QM --> LS
     LS --> R
 ```
+## 3 Shell Proctors
 
-# GUI
-
-```plaintext
-GUI/
-├── GUI.java                     // Main JFrame (**not implemented**)
-│   Utilities/                   // Utility classes for GUI
-│   └── ScalingUtil.java         // Utility class for scaling components to get a basic version of Swifts dynamic geometry
-│   └── DrawingUtils.java        // Utility class for drawing shadows and hover effects
-├── components/                  // Custom components for GUI
-│   ├── SearchBar.java           // Custom search bar component 
-│   ├── SearchButton.java        // Search button component
-│   ├── CustomTextField.java     // Text field with custom styling to blend into the JPanel (SearchBar.java)
-│   ├── ModernButton.java        // Button designed to look like a SwiftUI rounded button
-│   ├── Menu.java                // Settings menu (**not implemented**)
-│   ├── Title.java               // Custom formatted title component (**not used**)
-│   ├── BaseResultCard.java      // Sets up the result card colors, hover animation, and parses the result text
-│   ├── ResultCard.java          // Handles the design of the result card, scrollable panel, and hover effect for the scroll bar
-│   └── ResultsPanel.java        // Displays search results in a scrollable panel 
-│   GUIProgression/              // Progression classes for GUI
-│   ├── SearcherUI.java          // Handles the integration of the searcher handlers and the results layout
-│   ├── ComponentLayout.java     // Handles the default layout of the GUI
-│   └── BaseGUI.java             // Base abstract class for main JFrame handles setup
-├── jars/                        // External libraries 
-│   └── flatlaf.jar              // FlatLaf look and feel for GUI
-│   └── **Lucene jars**
-├── **Rest of files**
+**How to Run**
+```zsh 
+# Make the scripts executable
+chmod +x IndexExistsProcter.sh IndexNotExistsProcter.sh
+# Run the scripts
+./IndexExistsProcter.sh
+./IndexNotExistsProcter.sh
 ```
+
+To get the runtime benchmark data for the poster I ran the two scripts <code> `IndexExistsProctor.sh`</code> and <code>`IndexDoesNotExistProctor.sh`</code> these automate running the indexers and putting their index type [default | parallel | batch] and the corresponding elapsed time into a csv file to be plotted. 
+
+<p>
+
+The scripts were ran on the gutenberg data and the cranfield data. As well as, from the terminal in vs code and from the mac terminal.
+
+> **Note:** Since the time of the data collection I did modify the batch indexer to use a bigger batch for the cranfield data because I noticed that the batch indexer was taking slightly longer than the base parallel indexer for the cranfield data.
+<ul>
+    <li> **IndexExistsProctor.sh** - This script is used to get the data when running the indexing the files when the index already exists </li>
+    <li> **IndexDoesNotExistProctor.sh** - This script is used to get the data when running the indexing the files when the index does not exist </li>
+</ul>
+<p>
+Both of the documents were ran for both the cranfield data and the gutenburg data.
+See **DataVisualization** for more plots and code.
+
+> **Note:** At some point throughout the process, the indexers would take a mysteriously long time to run. If you get this during runtime I suggest warming it up by running the parallel indexers first. After some time the JVM will start to use JIT compilation and the indexers will run much faster.
+
+### 3.1 Results
+![image](DataVisualization/Combined_Boxplots.png)
+
+> TODO: Use ResultItems instead of parsing the string for the BaseResultCard
+Add

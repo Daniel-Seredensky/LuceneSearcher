@@ -2,6 +2,9 @@ package src;
 import java.io.File;
 import javax.swing.SwingUtilities;
 import GUI.GUIProgression.SearcherUI;
+import src.Indexers.TextFileIndexer;
+import src.Indexers.TextFileIndexerPBatch;
+import src.Indexers.TextFileIndexerParallel;
 
 /**
  * Main Controller for the Final Project
@@ -29,13 +32,14 @@ public class Main {
      * @author Daniel, Oliwia, Ojo, William
      * @version March 2025
      */
-
     public static void main(String[] args) {
         String dataPath = "./data";
         String indexPath = "./indexData";
         String mode = null; // optional indexing mode: new, changed, or missing
         boolean launchGUI = true;
         boolean explain = false;
+        boolean parallel = false;
+        boolean batch = false;
         int maxResults = 5;
         String err = null;
         
@@ -65,6 +69,12 @@ public class Main {
                     break;
                 case  "-explain":
                     explain = true;
+                    break;
+                case "-parallel":
+                    parallel = true;
+                    break;
+                case "-batch":
+                    batch = true;
                     break;
             }
         }
@@ -108,9 +118,15 @@ public class Main {
         if (dataPath != null) System.out.println("Data path: " + dataPath);
         if (indexPath != null) System.out.println("Index path: " + indexPath);
         if (mode != null) System.out.println("Indexing mode:mode " + mode);
+        if (explain) System.out.println("Explain: true");
+        if (parallel) System.out.println("Parallel: true");
+        if (batch) System.out.println("Batch: true");
+        if (! (batch || parallel)) System.out.println("Default Indexer");
         System.out.println(isGutenberg ? "Gutenberg data" : "Cranfield data");
         
-        TextFileIndexer.run(dataPath, indexPath, mode, isGutenberg);
+        if (! (batch || parallel)) TextFileIndexer.run(dataPath, indexPath, mode, isGutenberg,true);
+        if (batch && ! parallel) TextFileIndexerPBatch.run(dataPath, indexPath, mode, isGutenberg,true);
+        if (parallel && !batch ) TextFileIndexerParallel.run(dataPath, indexPath, mode, isGutenberg,true);
         
         // Launch GUI 
         if (launchGUI) {

@@ -1,10 +1,6 @@
-package src;
-import org.apache.lucene.analysis.CharArraySet;
+package src.Indexers;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -15,16 +11,8 @@ import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.core.LowerCaseFilter;
-import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.analysis.en.PorterStemFilter;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
-import java.io.StringReader;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -41,11 +29,11 @@ import java.util.Set;
  *       *** START OF THE PROJECT GUTENBERG EBOOK and *** END OF THE PROJECT GUTENBERG EBOOK).</li>
  *   <li>stemcontent: The text after applying Porter stemming.</li>
  *   <li>stopcontent: The text after removing stop words.</li>
- *   <li>author: The author’s name (extracted from a line containing "Author:").</li>
+ *   <li>author: The author's name (extracted from a line containing "Author:").</li>
  *   <li>title: The document title (from a line containing "Title:"; if absent, the filename is used).</li>
  *   <li>filename: The name of the .txt file.</li>
  *   <li>filepath: The full path to the .txt file.</li>
- *   <li>modified: The file’s last modified timestamp.</li>
+ *   <li>modified: The file's last modified timestamp.</li>
  * </ul>
  * 
  * Usage:
@@ -64,21 +52,24 @@ public class TextFileIndexer {
         int added;
         int changed;
         int removed;
+        double elapsedTime;
 
         public IndexingResult(int added, int changed, int removed) {
             this.added = added;
             this.changed = changed;
             this.removed = removed;
         }
+
+        public void addElapsedTime(double elapsedTime) {
+            this.elapsedTime = elapsedTime;
+        }
     }
 
     static class DocumentInfo {
         long modifiedTime;
-        Document doc;
 
-        public DocumentInfo(long modifiedTime, Document doc) {
+        public DocumentInfo(long modifiedTime) {
             this.modifiedTime = modifiedTime;
-            this.doc = doc;
         }
     }
 
@@ -89,10 +80,10 @@ public class TextFileIndexer {
      * @param option       Optional indexing mode: "new", "changed", or "missing".
      * @param isGutenberg  True if files are Gutenberg-formatted.
      */
-    public static void run(String dataDirPath, String indexDirPath, String option, boolean isGutenberg) {
+    public static double run(String dataDirPath, String indexDirPath, String option, boolean isGutenberg, boolean verbose) {
         if (dataDirPath == null || indexDirPath == null) {
             System.err.println("Usage: run <dataDirPath> <indexDirPath> [new|changed|missing]");
-            return;
+            return -1;
         }
         
         // Validate optional indexing mode, if provided.
@@ -100,7 +91,7 @@ public class TextFileIndexer {
             option = option.toLowerCase();
             if (!option.equals("new") && !option.equals("changed") && !option.equals("missing")) {
                 System.err.println("Error: Invalid indexing option specified. Must be one of: new, changed, missing");
-                return;
+                return -1;
             }
         }
         
@@ -108,14 +99,19 @@ public class TextFileIndexer {
             long startTime = System.currentTimeMillis();
             IndexingResult result = indexTextFiles(dataDirPath, indexDirPath, option, isGutenberg);
             long elapsedTime = System.currentTimeMillis() - startTime;
+            result.addElapsedTime(elapsedTime);
 
-            System.out.println("Indexing completed.");
-            System.out.println("Documents added: " + result.added);
-            System.out.println("Documents changed: " + result.changed);
-            System.out.println("Documents removed: " + result.removed);
-            System.out.println("Indexing time: " + elapsedTime + " ms");
+            if (verbose) {
+                System.out.println("Indexing completed.");
+                System.out.println("Documents added: " + result.added);
+                System.out.println("Documents changed: " + result.changed);
+                System.out.println("Documents removed: " + result.removed);
+                System.out.println("Indexing time: " + elapsedTime + " ms");
+            }
+            return elapsedTime;
         } catch (IOException e) {
             e.printStackTrace();
+            return -1;
         }
     }
 
@@ -131,17 +127,26 @@ public class TextFileIndexer {
      */
     public static IndexingResult indexTextFiles(String dataDirPath, String indexDirPath, String option, boolean isGutenberg) throws IOException {
         Directory indexDir = FSDirectory.open(Paths.get(indexDirPath));
-        StandardAnalyzer analyzer = new StandardAnalyzer();
-
+        
+        // Use the shared analyzer from TextIndexingHelper
+        StandardAnalyzer analyzer = TextIndexingHelper.THREAD_LOCAL_ANALYZER.get();
+    
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         // Set TF-IDF scoring via ClassicSimilarity.
         config.setSimilarity(new ClassicSimilarity());
         IndexWriter writer = new IndexWriter(indexDir, config);
-
+    
         int added = 0;
         int changed = 0;
         int removed = 0;
-
+        
+        // Define batch size based on document type
+        // For Gutenberg files (large), commit after every 300 documents
+        // For Cranfield files (small), commit at the end
+        // This is because of a memory issue when indexing repeatedly as done in the Index proctor shell scrips
+        final int BATCH_SIZE = isGutenberg ? 300 : 1400;
+        int batchCount = 0;
+    
         // Build a map of already indexed documents (by filepath)
         Map<String, DocumentInfo> indexDocs = new HashMap<>();
         if (DirectoryReader.indexExists(indexDir)) {
@@ -156,172 +161,94 @@ public class TextFileIndexer {
                     String filepath = doc.get("filepath");
                     String modifiedStr = doc.get("modified");
                     long modifiedTime = Long.parseLong(modifiedStr);
-                    indexDocs.put(filepath, new DocumentInfo(modifiedTime, doc));
+                    indexDocs.put(filepath, new DocumentInfo(modifiedTime));
                 }
             }
             reader.close();
         }
-
+    
         File dataDir = new File(dataDirPath);
         File[] files = dataDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
-
+    
         // Build a set of file paths present in the directory for "missing" processing 
-        Set<String> currentFilePaths = new HashSet<>();
+        Set<String> currentFilePaths = new HashSet<>(files.length);
         if (files != null) {
             for (File file : files) {
-                currentFilePaths.add(file.getAbsolutePath());
-                DocumentInfo info = indexDocs.get(file.getAbsolutePath());
-
+                String filePath = file.getAbsolutePath(); 
+                currentFilePaths.add(filePath);
+                DocumentInfo info = indexDocs.get(filePath);
+    
+                boolean documentProcessed = false;
+                
                 if (option == null) {
                     // Default: index all files – add if new or update if modified.
                     if (info == null) {
-                        writer.addDocument(createDocument(file, isGutenberg));
+                        writer.addDocument(TextIndexingHelper.createDocument(file, isGutenberg));
                         added++;
+                        documentProcessed = true;
                     } else if (file.lastModified() > info.modifiedTime) {
-                        writer.updateDocument(new Term("filepath", file.getAbsolutePath()), createDocument(file, isGutenberg));
+                        writer.updateDocument(new Term("filepath", file.getAbsolutePath()), 
+                                             TextIndexingHelper.createDocument(file, isGutenberg));
                         changed++;
+                        documentProcessed = true;
                     }
                 } else if (option.equals("new")) {
                     // Only add files not already in the index.
                     if (info == null) {
-                        writer.addDocument(createDocument(file, isGutenberg));
+                        writer.addDocument(TextIndexingHelper.createDocument(file, isGutenberg));
                         added++;
+                        documentProcessed = true;
                     }
                 } else if (option.equals("changed")) {
                     // Only update files that are already indexed and have been modified
                     if (info != null && file.lastModified() > info.modifiedTime) {
-                        writer.updateDocument(new Term("filepath", file.getAbsolutePath()), createDocument(file, isGutenberg));
+                        writer.updateDocument(new Term("filepath", file.getAbsolutePath()), 
+                                             TextIndexingHelper.createDocument(file, isGutenberg));
                         changed++;
+                        documentProcessed = true;
+                    }
+                }
+                
+                // Commit in batches based on document type
+                if (documentProcessed) {
+                    batchCount++;
+                    if (batchCount >= BATCH_SIZE) {
+                        writer.commit();
+                        batchCount = 0;
                     }
                 }
             }
         }
-
+    
         // Option "missing": remove indexed documents whose files no longer exist.
         if (option != null && option.equals("missing")) {
+            int deleteBatchCount = 0;
             for (String filepath : indexDocs.keySet()) {
                 if (!currentFilePaths.contains(filepath)) {
                     writer.deleteDocuments(new Term("filepath", filepath));
                     removed++;
+                    
+                    deleteBatchCount++;
+                    if (deleteBatchCount >= BATCH_SIZE) {
+                        writer.commit();
+                        deleteBatchCount = 0;
+                    }
                 }
             }
         }
-
+    
+        // Final commit for any remaining documents
         writer.commit();
         writer.close();
         return new IndexingResult(added, changed, removed);
     }
-
-    /**
-     * createDocument reads the file and creates a Document with all required fields.
-     * If isGutenberg is true, only the text between the Gutenberg start and end markers is indexed as content.
-     *
-     * @param file        The text file to index.
-     * @param isGutenberg If true, extract content only between the Gutenberg markers.
-     * @return A Lucene Document.
-     * @throws IOException
-     */
-    private static Document createDocument(File file, boolean isGutenberg) throws IOException {
-        Document document = new Document();
-        StringBuilder contentBuilder = new StringBuilder();
-        String author = "";
-        String title = "";
-        boolean inGutenbergBlock = false;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Extract author and title from any line in the file 
-                if (line.contains("Author:") && author.isEmpty()) {
-                    author = line.substring(line.indexOf("Author:") + "Author:".length()).trim();
-                }
-                if (title.isEmpty() && line.contains("Title:")) {
-                    title = line.substring(line.indexOf("Title:") + "Title:".length()).trim();
-                }
-                // If Gutenberg extraction is enabled, collect only the text between the markers
-                if (isGutenberg) {
-                    if (line.contains("START OF THE PROJECT GUTENBERG EBOOK")) {
-                        inGutenbergBlock = true;
-                        continue;
-                    }
-                    if (line.contains("END OF THE PROJECT GUTENBERG EBOOK")) {
-                        inGutenbergBlock = false;
-                        break; // End of content block.
-                    }
-                    if (inGutenbergBlock) {
-                        contentBuilder.append(line).append("\n");
-                    }
-                } else {
-                    // For non-Gutenberg files, index the entire content.
-                    contentBuilder.append(line).append("\n");
-                }
-            }
-        }
-        String content = contentBuilder.toString();
-
-        // Process content for stemmed and stop-word removed versions.
-        String stemcontent = applyStemming(content);
-        String stopcontent = removeStopWords(content);
-
-        // Add required fields 
-        document.add(new TextField("content", content, Field.Store.YES));
-        document.add(new TextField("stem", stemcontent, Field.Store.YES));
-        document.add(new TextField("stop", stopcontent, Field.Store.YES));
-        document.add(new StringField("author", author, Field.Store.YES));
-        // Use title if found; otherwise default to filename
-        document.add(new StringField("title", title.isEmpty() ? file.getName() : title, Field.Store.YES));
-        document.add(new StringField("filename", file.getName(), Field.Store.YES));
-        document.add(new StringField("filepath", file.getAbsolutePath(), Field.Store.YES));
-        document.add(new StringField("modified", Long.toString(file.lastModified()), Field.Store.YES));
-
-        return document;
-    }
-
-    /**
-     * applyStemming tokenizes the text and applies Porter stemming.
-     *
-     * @param text Input text.
-     * @return A string with stemmed tokens.
-     */
-    private static String applyStemming(String text) throws IOException {
-        // Create a StandardTokenizer reading from the text
-        StandardTokenizer tokenizer = new StandardTokenizer();
-        tokenizer.setReader(new StringReader(text));
-        
-        // Build a token stream with lowercasing and stemming
-        TokenStream tokenStream = new LowerCaseFilter(tokenizer);
-        tokenStream = new PorterStemFilter(tokenStream);
-        
-        // Process the token stream
-        tokenStream.reset();
-        StringBuilder sb = new StringBuilder();
-        CharTermAttribute charTermAttr = tokenStream.addAttribute(CharTermAttribute.class);
-        while (tokenStream.incrementToken()) {
-            sb.append(charTermAttr.toString()).append(" ");
-        }
-        tokenStream.end();
-        tokenStream.close();
-        
-        return sb.toString().trim();
-    }
-
-    /**
-     * removeStopWords removes stop words from the text using the analyzer's default stop set.
-     *
-     * @param text Input text.
-     * @return A string with stop words removed.
-     */
-    private static String removeStopWords(String text) {
-        // Obtain the default stop words from a new StandardAnalyzer.
-        CharArraySet stopWords = (CharArraySet) new StandardAnalyzer().getStopwordSet();
-        StringBuilder sb = new StringBuilder();
-        String[] tokens = text.split("\\W+");
-        for (String token : tokens) {
-            if (token.isEmpty()) continue;
-            if (!stopWords.contains(token.toLowerCase())) {
-                sb.append(token).append(" ");
-            }
-        }
-        return sb.toString().trim();
+    
+    public static void main(String[] args) {
+        String indexDir = "indexCranfield";
+        String dataDir = "cranfieldSeparated";
+        boolean isGutenberg = false; 
+        String mode = null;
+        double time = TextFileIndexer.run(dataDir,indexDir,mode,isGutenberg,false);
+        System.out.println(""+time + "\n");
     }
 }

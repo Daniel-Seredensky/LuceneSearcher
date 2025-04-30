@@ -93,7 +93,6 @@ public class SearchButton extends JButton {
         int textWidth = fm.stringWidth(getText());
         int textHeight = fm.getHeight();
         
-        // center
         int x = (getWidth() - shadowSize - textWidth) / 2;
         int y = ((getHeight() - shadowSize - textHeight) / 2) + fm.getAscent();
         

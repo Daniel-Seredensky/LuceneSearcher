@@ -168,22 +168,19 @@ public class ResultCard extends BaseResultCard {
         width -= ScalingUtil.scalePadding(10);
         height -= ScalingUtil.scalePadding(10);
 
-        // Create a rounded rectangle for the card shape
         int arc = ScalingUtil.scaleWidth(30);
         Shape cardShape = new RoundRectangle2D.Float(0, 0, width, height, arc, arc);
 
-        // Draw shadow behind the card using a helper from DrawingUtils
-        Color shadowColor = DrawingUtils.createShadowColor(100); // Semi-transparent shadow
+        Color shadowColor = DrawingUtils.createShadowColor(100); 
         int shadowSize = ScalingUtil.scalePadding(10);
         DrawingUtils.drawShadow(g2, cardShape, shadowSize, shadowColor);
 
-        // Fill the card background with a darkened version of the theme color PUNGA
         Color backgroundColor = DrawingUtils.darkenColor(PUNGA, 0.4f);
         backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), 
                                     backgroundColor.getBlue(), 150); // Slight transparency
         g2.setColor(backgroundColor);
         g2.fill(cardShape);
-        // Setup font and padding parameters
+
         int padding = ScalingUtil.scalePadding(25);
         Font titleFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleWidth(22));
         Font normalFont = new Font("SansSerif", Font.PLAIN, ScalingUtil.scaleWidth(14));
@@ -281,7 +278,7 @@ public class ResultCard extends BaseResultCard {
                 }
             }
 
-            // Render full explanation (if available), line by line
+            // Render full explanation (if available)
             if (fullExplanation != null && !fullExplanation.isEmpty()) {
                 DrawingUtils.drawTextWithShadow(g2, "Full Explanation:", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
                 detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);

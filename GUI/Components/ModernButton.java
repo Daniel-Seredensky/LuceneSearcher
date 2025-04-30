@@ -26,11 +26,11 @@ public class ModernButton extends JButton {
     private Color borderColor;
     private final int arcRadius = ScalingUtil.scalePadding(30);
     private final int shadowSize = ScalingUtil.scalePadding(10);
-    private final Color shadowColor = new Color(0, 0, 0, 50); // Semi-transparent black for shadow
+    private final Color shadowColor = new Color(0, 0, 0, 50); 
     
-    // State tracking variables
-    private boolean isHovered = false;
-    private boolean isPressed = false;
+    // State tracking variables - changed from private to protected for subclass access
+    protected boolean isHovered = false;
+    protected boolean isPressed = false;
 
     /**
      * Constructs a ModernButton with the specified dimensions and text.
@@ -99,17 +99,15 @@ public class ModernButton extends JButton {
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
-        // Enable anti-aliasing for smoother rounded corners
+        // anti-aliasing for smoother rounded corners
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         
         // Create the rounded rectangle shape, accounting for shadow
         Shape roundedRect = new RoundRectangle2D.Float(0, 0, getWidth() - shadowSize, getHeight() - shadowSize, arcRadius, arcRadius);
         
-        // Draw the shadow first
         DrawingUtils.drawShadow(g2, roundedRect, shadowSize, shadowColor);
         
-        // Set clip to the component shape for further painting
         g2.setClip(roundedRect);
         
         // Determine the current color based on button state
@@ -122,14 +120,12 @@ public class ModernButton extends JButton {
             currentColor = normalBackground;
         }
         
-        // Fill the button background
         g2.setColor(currentColor);
         g2.fill(roundedRect);
         
         g2.setColor(borderColor);
         g2.draw(roundedRect);
         
-        // Reset clip before drawing text
         g2.setClip(null);
         
         FontMetrics fm = g2.getFontMetrics();
@@ -143,5 +139,80 @@ public class ModernButton extends JButton {
         g2.drawString(text, x, y);
         
         g2.dispose();
+    }
+    
+    /**
+     * Returns whether the button is currently in a hovered state.
+     * 
+     * @return true if the button is being hovered over, false otherwise
+     */
+    public boolean isHovered() {
+        return isHovered;
+    }
+    
+    /**
+     * Returns whether the button is currently in a pressed state.
+     * 
+     * @return true if the button is being pressed, false otherwise
+     */
+    public boolean isPressed() {
+        return isPressed;
+    }
+    
+    /**
+     * Gets the shadow size used for this button.
+     * 
+     * @return the shadow size in pixels
+     */
+    public int getShadowSize() {
+        return shadowSize;
+    }
+    
+    /**
+     * Gets the arc radius used for the rounded corners.
+     * 
+     * @return the arc radius in pixels
+     */
+    public int getArcRadius() {
+        return arcRadius;
+    }
+    
+    /**
+     * Sets the normal background color of the button.
+     * 
+     * @param color the color to use for normal state
+     */
+    public void setNormalBackground(Color color) {
+        this.normalBackground = color;
+        this.hoverBackground = DrawingUtils.lightenColor(color, 0.1f);
+        this.pressedBackground = DrawingUtils.darkenColor(color, 0.1f);
+        repaint();
+    }
+    
+    /**
+     * Gets the normal background color of the button.
+     * 
+     * @return the normal background color
+     */
+    public Color getNormalBackground() {
+        return normalBackground;
+    }
+    
+    /**
+     * Gets the hover background color of the button.
+     * 
+     * @return the hover background color
+     */
+    public Color getHoverBackground() {
+        return hoverBackground;
+    }
+    
+    /**
+     * Gets the pressed background color of the button.
+     * 
+     * @return the pressed background color
+     */
+    public Color getPressedBackground() {
+        return pressedBackground;
     }
 }

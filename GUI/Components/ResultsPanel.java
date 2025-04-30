@@ -37,7 +37,7 @@ public class ResultsPanel extends JPanel {
         
         int topPadding = ScalingUtil.scalePadding(50);
         int sidePadding = ScalingUtil.scalePadding(50);
-        int bottomPadding = ScalingUtil.scalePadding(20); // Reduced bottom padding
+        int bottomPadding = ScalingUtil.scalePadding(20); 
         cardsContainer.setBorder(new EmptyBorder(topPadding, sidePadding, bottomPadding, sidePadding));
         
         // Create a scroll pane for the cards container

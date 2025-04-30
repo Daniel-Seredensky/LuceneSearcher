@@ -33,7 +33,7 @@ public class QueryManager {
             Arrays.asList("filename", "filepath", "modified", "author", "title")
     );
     // All searchable fields (both analyzed and non-analyzed).
-    private static final String[] ALL_FIELDS = new String[]{
+    public static final String[] ALL_FIELDS = new String[]{
             "content", "stem", "stop", "author", "title", "filename", "filepath", "modified"
     };
     
