@@ -137,6 +137,7 @@ public class SearchManager {
             System.out.println("Valid queries are of the form: <field>:<value>, <field>:<value> AND <field>:<value>, \"<value>\" for literal searches, or <value> (default search includes all fields).");
             return "";
         }
+
         if (searchQuery.equals("*ChangeMode*")) {
             isLenientQuery = !isLenientQuery;
             System.out.println("Wild card search mode is now " + (isLenientQuery ? "enabled" : "disabled") + " for non analyzed fields.");
@@ -147,12 +148,13 @@ public class SearchManager {
         queryManager.setSearchQuery(searchQuery);
         queryManager.process();
 
-        System.out.println("");// new line because it looks better
+        System.out.println(""); // new line because it looks better
         System.out.println("Query field's used: "+ queryManager.findRequestedFields());
         if (!queryManager.isValid()) {
             System.out.println("Invalid query. Enter *help* for guidance on valid queries.");
             return "";
         }
+
         // Retrieve the built Lucene Query 
         Query query = queryManager.getBuiltQuery();
         System.out.println("Your Constructed Lucene Query: " + query.rewrite(luceneSearcher.getIndexReader()).toString());
@@ -171,6 +173,66 @@ public class SearchManager {
         } catch (Exception e) {
             e.printStackTrace();
             return "No results found.";
+        }
+    }
+    /**
+     * Searches the index for the given query string.
+     *
+     * <p>
+     * This method uses QueryManager to process the user query, which leverages the custom
+     * MultiFieldQueryParser (with a PerFieldAnalyzerWrapper) to build a Lucene Query and to identify
+     * the requested fields. The built query is then executed by LuceneSearcher, and the TopDocs result is
+     * processed by Results to produce a formatted output string.
+     * </p>
+     *
+     * @param searchQuery The search query string.
+     * @param asResults additional parameter to return results as Results object (for GUI)
+     * @return A formatted String with search results.
+     * @throws IOException
+     * @throws ParseException
+     * @throws InvalidTokenOffsetsException
+     */
+    public Results searchIndex(String searchQuery, boolean asResults) throws IOException {
+        // Initialize QueryManager with the user's query.
+        if (searchQuery.equals("*help*")) {
+            System.out.println("Valid queries are of the form: <field>:<value>, <field>:<value> AND <field>:<value>, \"<value>\" for literal searches, or <value> (default search includes all fields).");
+            return null;
+        }
+        if (searchQuery.equals("*ChangeMode*")) {
+            isLenientQuery = !isLenientQuery;
+            System.out.println("Wild card search mode is now " + (isLenientQuery ? "enabled" : "disabled") + " for non analyzed fields.");
+            return null;
+        }
+
+        queryManager.setQueryMode(!isLenientQuery);
+        queryManager.setSearchQuery(searchQuery);
+        queryManager.process();
+
+        System.out.println(""); // new line because it looks better
+        System.out.println("Query field's used: "+ queryManager.findRequestedFields());
+        if (!queryManager.isValid()) {
+            System.out.println("Invalid query. Enter *help* for guidance on valid queries.");
+            return null;
+        }
+
+        // Retrieve the built Lucene Query 
+        Query query = queryManager.getBuiltQuery();
+        System.out.println("Your Constructed Lucene Query: " + query.rewrite(luceneSearcher.getIndexReader()).toString());
+        System.out.println(""); // new line because it looks better
+
+        // Get the set of requested fields (either detected from fielded syntax or default to all fields).
+        Set<String> requestedFields = queryManager.findRequestedFields();
+
+        // Retrieve the top search results from the searcher
+        TopDocs topDocs = luceneSearcher.search(query);
+
+        // return resultsOutput 
+        try {
+            Results resultsOutput = Results.fromTopDocs(luceneSearcher.getIndexSearcher(), query, topDocs, queryManager.getPerFieldAnalyzer(), requestedFields, explain);
+            return resultsOutput;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

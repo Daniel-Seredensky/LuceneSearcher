@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import src.ResultItem;
 
 public class ResultCard extends BaseResultCard {
     private JPanel contentPanel;
@@ -30,8 +31,8 @@ public class ResultCard extends BaseResultCard {
      *
      * @param resultString the raw result string
      */
-    public ResultCard(String resultString) {
-        super(resultString);
+    public ResultCard(ResultItem resultItem) {
+        super(resultItem);
         
         setLayout(new BorderLayout());
         
@@ -252,7 +253,7 @@ public class ResultCard extends BaseResultCard {
 
             // Render best fragment text if provided
             if (bestFragment != null && !bestFragment.isEmpty()) {
-                DrawingUtils.drawTextWithShadow(g2, "Best Fragment:", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
+                DrawingUtils.drawTextWithShadow(g2, "Best Fragment from " + bestFragmentField +":", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
                 detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
 
                 String[] words = bestFragment.split("\\s+");
@@ -279,7 +280,7 @@ public class ResultCard extends BaseResultCard {
             }
 
             // Render full explanation (if available)
-            if (fullExplanation != null && !fullExplanation.isEmpty()) {
+            if (hasExplanation && !fullExplanation.isEmpty()) {
                 DrawingUtils.drawTextWithShadow(g2, "Full Explanation:", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
                 detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
                 String[] explanationLines = fullExplanation.split("\n");

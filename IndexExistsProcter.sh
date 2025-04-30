@@ -18,8 +18,6 @@ run_and_record() {
   )
   echo "${TYPE},${TIME}" >> "$CSV_FILE"
   
-  # Force garbage collection and pause briefly between runs
-  java -cp "jars/*:." -XX:+ExplicitGCInvokesConcurrent "$CLASS" 
   sleep 2  
 }
 

@@ -5,6 +5,7 @@ import GUI.GUIProgression.SearcherUI;
 import src.Indexers.TextFileIndexer;
 import src.Indexers.TextFileIndexerPBatch;
 import src.Indexers.TextFileIndexerParallel;
+import src.Indexers.TextFileIndexer.IndexingResult;
 
 /**
  * Main Controller for the Final Project
@@ -124,16 +125,29 @@ public class Main {
         if (! (batch || parallel)) System.out.println("Default Indexer");
         System.out.println(isGutenberg ? "Gutenberg data" : "Cranfield data");
         
-        if (! (batch || parallel)) TextFileIndexer.run(dataPath, indexPath, mode, isGutenberg,true);
-        if (batch && ! parallel) TextFileIndexerPBatch.run(dataPath, indexPath, mode, isGutenberg,true);
-        if (parallel && !batch ) TextFileIndexerParallel.run(dataPath, indexPath, mode, isGutenberg,true);
+        IndexingResult indexingResults;
+        if (! (batch || parallel)) {
+            TextFileIndexer.run(dataPath, indexPath, mode, isGutenberg,true);
+            indexingResults = TextFileIndexer.getMostRecentIndexingResult();
+        }
+        else if (batch && ! parallel) {
+            TextFileIndexerPBatch.run(dataPath, indexPath, mode, isGutenberg,true);
+            indexingResults = TextFileIndexerPBatch.getMostRecentIndexingResult();
+        }
+        else if (parallel && !batch) {
+            TextFileIndexerParallel.run(dataPath, indexPath, mode, isGutenberg,true);
+            indexingResults = TextFileIndexerParallel.getMostRecentIndexingResult();
+        } else {
+            System.out.println("Indexer arguments are mutually exclusive,\n please choose one of the following: -batch | -parallel | <no arg for default>");
+            return;
+        }
         
         // Launch GUI 
         if (launchGUI) {
             final String indexPathFinal = indexPath;
             final boolean explainFinal = explain;
             SwingUtilities.invokeLater(() -> {
-                SearcherUI ui = new SearcherUI("title",indexPathFinal, explainFinal, maxResults);
+                SearcherUI ui = new SearcherUI("title",indexPathFinal, explainFinal, maxResults,indexingResults);
                 ui.setVisible(true);
             });
         } else {

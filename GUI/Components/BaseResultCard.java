@@ -8,9 +8,11 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import src.ResultItem;
+
 public class BaseResultCard extends JPanel {
 
-    // Fields parsed from the result string
+    // Fields taken from the ResultItem 
     protected int resultNumber;
     protected String filename;
     protected String title;
@@ -18,6 +20,8 @@ public class BaseResultCard extends JPanel {
     protected double score;
     protected String bestFragment;
     protected String fullExplanation;
+    protected boolean hasExplanation;
+    protected String bestFragmentField;
 
     // Colors from the theme (declared as protected so the subclass can use them)
     protected final Color PUNGA = new Color(0x4D483D);
@@ -39,10 +43,10 @@ public class BaseResultCard extends JPanel {
     /**
      * Constructs a new BaseResultCard by parsing the provided result string.
      *
-     * @param resultString the raw string representing the result output
+     * @param resultItem the data structure containing the relevant result data
      */
-    public BaseResultCard(String resultString) {
-        parseResultString(resultString);
+    public BaseResultCard(ResultItem resultItem) {
+        parseResultFields(resultItem);
 
         // Set an initial preferred size
         Dimension curSize = new Dimension(ScalingUtil.scaleWidth(1000), COLLAPSED_HEIGHT);
@@ -119,49 +123,27 @@ public class BaseResultCard extends JPanel {
     }
 
     /**
-     * Parses the result string into component fields.
+     * Extracts fields from the ResultItem and sets the corresponding instance variables.
      *
-     * @param resultString the raw result string
+     * @param resultItem the data structure containing the relevant result data
      */
-    protected void parseResultString(String resultString) {
-        String[] lines = resultString.split("\\n");
-        StringBuilder explanationBuilder = new StringBuilder();
-        boolean readingExplanation = false;
-
-        for (String line : lines) {
-            if (line.startsWith("Result Number:")) {
-                try {
-                    resultNumber = Integer.parseInt(line.substring("Result Number:".length()).trim());
-                } catch (NumberFormatException e) {
-                    resultNumber = -1;
-                }
-            } else if (line.startsWith("Filename:")) {
-                filename = line.substring("Filename:".length()).trim();
-            } else if (line.startsWith("Title:")) {
-                title = line.substring("Title:".length()).trim();
-            } else if (line.startsWith("Author:")) {
-                author = line.substring("Author:".length()).trim();
-            } else if (line.startsWith("Score:")) {
-                try {
-                    score = Double.parseDouble(line.substring("Score:".length()).trim());
-                } catch (NumberFormatException e) {
-                    score = 0.0;
-                }
-            } else if (line.startsWith("Best Fragment")) {
-                int colonIndex = line.indexOf(":");
-                if (colonIndex != -1) {
-                    bestFragment = line.substring(colonIndex + 1).trim();
-                }
-            } else if (line.startsWith("Full Explanation:")) {
-                readingExplanation = true;
-            } else {
-                if (readingExplanation) {
-                    explanationBuilder.append(line).append("\n");
-                }
-            }
-        }
-        if (explanationBuilder.length() > 0) {
-            fullExplanation = explanationBuilder.toString().trim();
+    protected void parseResultFields(ResultItem resultItem) {
+        // Extract data directly from the ResultItem object using its getter methods
+        this.hasExplanation = resultItem.hasExplanation();
+        this.resultNumber = resultItem.getResultNumber();
+        this.filename = resultItem.getFilename();
+        this.title = resultItem.getTitle();
+        this.author = resultItem.getAuthor();
+        this.score = resultItem.getScore();
+        this.bestFragment = resultItem.getBestFragment();
+        this.bestFragmentField = resultItem.getBestField();
+        
+        // Set explanation if available
+        if (hasExplanation) {
+            this.fullExplanation = resultItem.getExplanation();
+        } else {
+            this.fullExplanation = "";
         }
     }
+
 }

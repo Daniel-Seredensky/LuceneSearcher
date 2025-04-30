@@ -126,9 +126,9 @@ public class Results {
             }
 
             // If a best extra field is found, use the highlighter to get its best fragment.
+            String bestFragment = "";
             if (bestField != null) {
                 String fieldContent = doc.get(bestField);
-                String bestFragment = "";
                 if (fieldContent != null && !fieldContent.isEmpty()) {
                     bestFragment = highlighter.getBestFragment(analyzer, bestField, fieldContent);
                 }
@@ -144,7 +144,8 @@ public class Results {
                       .append(explanation.toString());
             }
 
-            ResultItem item = new ResultItem(filename, title, author, output.toString(), score);
+            ResultItem item = shouldExplain ? new ResultItem(filename, title, author,bestField, bestFragment, output.toString(), score, i+1, explanation.toString()) 
+                : new ResultItem(filename, title, author,bestField, bestFragment, output.toString(), score,i+1);
             results.addResult(item);
             i++;
         }

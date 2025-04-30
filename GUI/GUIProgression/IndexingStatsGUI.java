@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import GUI.GUIProgression.SearcherUI;
+import src.Indexers.TextFileIndexer.IndexingResult;
 
 /**
  * GUI for displaying Lucene indexing statistics.
@@ -17,6 +19,7 @@ public class IndexingStatsGUI extends BaseGUI {
     private JPanel statsPanel;
     private JPanel buttonPanel;
     private JButton closeButton;
+    private SearcherUI caller;
     
     private final DecimalFormat timeFormat = new DecimalFormat("#0.000");
     
@@ -27,8 +30,10 @@ public class IndexingStatsGUI extends BaseGUI {
      * 
      * @param result The indexing result to display
      */
-    public IndexingStatsGUI(IndexingResult result) {
+    public IndexingStatsGUI(IndexingResult result, SearcherUI caller) {
         super("Lucene Indexing Statistics");
+        this.caller = caller;
+        this.caller.setShowingIndexingResults(true);
         this.result = result;
         updateStats();
     }
@@ -66,7 +71,7 @@ public class IndexingStatsGUI extends BaseGUI {
                                                   textColor, shadowColor, 3);
                     DrawingUtils.drawTextWithShadow(g2d, String.valueOf(result.changed), leftMargin + 250, y, valueFont, 
                                                   textColor, shadowColor, 4);
-                    
+                
                     y += lineHeight;
                     DrawingUtils.drawTextWithShadow(g2d, "Documents Removed:", leftMargin, y, statFont, 
                                                   textColor, shadowColor, 3);
@@ -91,7 +96,10 @@ public class IndexingStatsGUI extends BaseGUI {
         buttonPanel.setOpaque(false);
         
         closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
+        closeButton.addActionListener(e -> {
+            this.caller.setShowingIndexingResults(false);
+            dispose();
+        });
         buttonPanel.add(closeButton);
     }
     
@@ -134,36 +142,4 @@ public class IndexingStatsGUI extends BaseGUI {
         closeButton.addActionListener(listener);
     }
     
-    /**
-     * Class representing indexing operation results.
-     */
-    public static class IndexingResult {
-        int added;
-        int changed;
-        int removed;
-        double elapsedTime;
-        
-        public IndexingResult(int added, int changed, int removed) {
-            this.added = added;
-            this.changed = changed;
-            this.removed = removed;
-        }
-        
-        public void addElapsedTime(double elapsedTime) {
-            this.elapsedTime = elapsedTime;
-        }
-    }
-    
-    /**
-     * Main method for testing the GUI.
-     */
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            IndexingResult result = new IndexingResult(125, 37, 14);
-            result.addElapsedTime(3.456);
-            
-            IndexingStatsGUI gui = new IndexingStatsGUI(result);
-            gui.setVisible(true);
-        });
-    }
 }

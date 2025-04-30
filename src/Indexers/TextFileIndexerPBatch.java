@@ -13,6 +13,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
 
 import src.Indexers.TextFileIndexer.DocumentInfo;
+import src.Indexers.TextFileIndexer.IndexingResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TextFileIndexerPBatch {
 
+    private static IndexingResult mostRecentIndexingResult;
+
+    public static IndexingResult  getMostRecentIndexingResult() {
+        return mostRecentIndexingResult == null ? new IndexingResult(-1, -1, -1) : mostRecentIndexingResult;
+    }
+
     /**
      * Entry point: same signature as TextFileIndexer.
      */
@@ -57,6 +64,7 @@ public class TextFileIndexerPBatch {
             TextFileIndexer.IndexingResult result = indexTextFilesBatch(dataDirPath, indexDirPath, option, isGutenberg);
             long elapsedTime = System.currentTimeMillis() - startTime;
             result.addElapsedTime(elapsedTime);
+            mostRecentIndexingResult = result;
 
             if (verbose) {
                 System.out.println("Batch-based parallel indexing completed.");
@@ -242,5 +250,6 @@ public class TextFileIndexerPBatch {
         String mode = null;
         double time = TextFileIndexerPBatch.run(dataDir,indexDir,mode,isGutenberg,false);
         System.out.println(""+time + "\n");
+        System.gc();
     }
 }

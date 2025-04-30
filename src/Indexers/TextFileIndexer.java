@@ -46,13 +46,18 @@ import java.util.Set;
  * @author adapted by Daniel Seredensky, Oliwia, Ojo, William 
  */
 public class TextFileIndexer {
+    private static IndexingResult mostRecentIndexingResult;
+
+    public static IndexingResult  getMostRecentIndexingResult() {
+        return mostRecentIndexingResult == null ? new IndexingResult(-1, -1, -1) : mostRecentIndexingResult;
+    }
 
     // Helper classes to store indexing results and document info from the index.
-    static class IndexingResult {
-        int added;
-        int changed;
-        int removed;
-        double elapsedTime;
+    public static class IndexingResult {
+        public int added;
+        public int changed;
+        public int removed;
+        public double elapsedTime;
 
         public IndexingResult(int added, int changed, int removed) {
             this.added = added;
@@ -100,6 +105,7 @@ public class TextFileIndexer {
             IndexingResult result = indexTextFiles(dataDirPath, indexDirPath, option, isGutenberg);
             long elapsedTime = System.currentTimeMillis() - startTime;
             result.addElapsedTime(elapsedTime);
+            mostRecentIndexingResult = result;
 
             if (verbose) {
                 System.out.println("Indexing completed.");
@@ -250,5 +256,6 @@ public class TextFileIndexer {
         String mode = null;
         double time = TextFileIndexer.run(dataDir,indexDir,mode,isGutenberg,false);
         System.out.println(""+time + "\n");
+        System.gc();
     }
 }

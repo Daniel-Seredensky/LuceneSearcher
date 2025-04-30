@@ -147,6 +147,3 @@ See **DataVisualization** for more plots and code.
 
 ### 3.1 Results
 ![image](DataVisualization/Combined_Boxplots.png)
-
-> TODO: Use ResultItems instead of parsing the string for the BaseResultCard
-Add

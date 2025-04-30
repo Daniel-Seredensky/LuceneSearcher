@@ -13,6 +13,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
 
 import src.Indexers.TextFileIndexer.DocumentInfo;
+import src.Indexers.TextFileIndexer.IndexingResult;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see {@link TextFileIndexer}
  */
 public class TextFileIndexerParallel {
+    private static IndexingResult mostRecentIndexingResult;
+
+    public static IndexingResult  getMostRecentIndexingResult() {
+        return mostRecentIndexingResult == null ? new IndexingResult(-1, -1, -1) : mostRecentIndexingResult;
+    }
 
     /**
      * Replaces the main method for parallel indexing. Usage is the same as the base class.
@@ -46,9 +53,10 @@ public class TextFileIndexerParallel {
         }
         try {
             long startTime = System.currentTimeMillis();
-            TextFileIndexer.IndexingResult result = indexTextFilesParallel(dataDirPath, indexDirPath, option, isGutenberg);
+            IndexingResult result = indexTextFilesParallel(dataDirPath, indexDirPath, option, isGutenberg);
             long elapsedTime = System.currentTimeMillis() - startTime;
             result.addElapsedTime(elapsedTime);
+            mostRecentIndexingResult = result;
 
             if (verbose){
                 System.out.println("Parallel indexing completed.");
@@ -67,7 +75,7 @@ public class TextFileIndexerParallel {
     /**
      * Performs parallel indexing of text files, mirroring the base class logic but using parallel streams.
      */
-    public static TextFileIndexer.IndexingResult indexTextFilesParallel(String dataDirPath, String indexDirPath, String option, boolean isGutenberg) throws IOException {
+    public static IndexingResult indexTextFilesParallel(String dataDirPath, String indexDirPath, String option, boolean isGutenberg) throws IOException {
         Directory indexDir = FSDirectory.open(Paths.get(indexDirPath));
         
         // Use the shared analyzer from TextIndexingHelper
@@ -199,7 +207,7 @@ public class TextFileIndexerParallel {
         // Final commit for any remaining documents
         writer.commit();
         writer.close();
-        return new TextFileIndexer.IndexingResult(added.get(), changed.get(), removed.get());
+        return new IndexingResult(added.get(), changed.get(), removed.get());
     }
     
     public static void main(String[] args) {
@@ -209,5 +217,6 @@ public class TextFileIndexerParallel {
         String mode = null;
         double time = TextFileIndexerParallel.run(dataDir,indexDir,mode,isGutenberg,false);
         System.out.println(""+time + "\n");
+        System.gc();
     }
 }

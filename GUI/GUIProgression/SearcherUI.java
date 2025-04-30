@@ -8,19 +8,23 @@ import GUI.Utilities.ScalingUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import src.Results;
+import src.Indexers.TextFileIndexer.IndexingResult;
 
 public class SearcherUI extends ComponentLayout {
 
     private SearchManager searchManager;
-    private ArrayList<String> results;                   // holds the result strings
+    private Results results;                   
     private ResultsPanel resultsPanel;
-
+    private IndexingResult indexResults;
+    private boolean isShowingIndexingResults = false;
 
     /**
      * Constructor that also initializes the SearchManager with given parameters.
      */
-    public SearcherUI(String title, String indexPath, boolean explain, int maxResults) {
+    public SearcherUI(String title, String indexPath, boolean explain, int maxResults,IndexingResult indexResults) {
         super(title);
+        this.indexResults = indexResults;
         // Create the SearchManager using the specified parameters
         try {
             searchManager = new SearchManager(indexPath, explain, maxResults);
@@ -30,6 +34,11 @@ public class SearcherUI extends ComponentLayout {
         }
         // Initialize the handlers
         addSearchButtonHandler();
+        addIndexingResultsButtonHandler();
+    }
+
+    public void setShowingIndexingResults(boolean isShowingIndexingResults) {
+        this.isShowingIndexingResults = isShowingIndexingResults;
     }
 
     /**
@@ -104,7 +113,7 @@ public class SearcherUI extends ComponentLayout {
             String maxResultsString = maxResultsField.getText();
             maxResultsField.setText("");
             if (maxResultsString.isEmpty()){
-                maxResultsString = "5";
+                maxResultsString = maxResultsField.getPrompt();
             }
             int maxResultsNumber;
             try {
@@ -121,14 +130,17 @@ public class SearcherUI extends ComponentLayout {
             String query = searchBar.getTextField().getText();
 
             ArrayList<Object> fields = new ArrayList<>(searchBar.getComboBox().getSelectedItems());
-            query = fields.contains("Literal Search") ? "\"" + query + "\"" : query;
+            boolean hasLiteralSearch = fields.contains("Literal Search");
+            query = hasLiteralSearch ? "\"" + query + "\"" : query;
+            
 
             String finalQuery = "";
             // Add the fields to the query
             for (int i = 0; i < fields.size(); i++) {
                 if (fields.get(i).equals("Literal Search")) continue;
                 boolean isNextOutOfBounds = i + 1 >= fields.size();
-                finalQuery += isNextOutOfBounds ? fields.get(i) + ": " + query : fields.get(i) + ": " + query + " AND ";
+                boolean isNextFieldLiteral = isNextOutOfBounds ? false : fields.get(i + 1).equals("Literal Search");
+                finalQuery += isNextOutOfBounds || isNextFieldLiteral ? fields.get(i) + ": " + query : fields.get(i) + ": " + query + " AND ";
             }
             query = finalQuery.isEmpty() ? query : finalQuery;
 
@@ -136,19 +148,21 @@ public class SearcherUI extends ComponentLayout {
 
             // Execute the search and store results
             try{
-                String resultString = searchManager.searchIndex(query);
-                System.out.println("Result String: " + resultString);
-                results = parseSearchResults(resultString);
+                results = searchManager.searchIndex(query, true);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+
             isShowingResults = true; // triggers the "results" layout
+
+            // close the searcher and reset text field
             try{
                 searchManager.luceneSearcher.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
             searchBar.getTextField().setText("");
+
             // Update UI
             layoutComponents();
             revalidate();
@@ -156,31 +170,15 @@ public class SearcherUI extends ComponentLayout {
         });
     }
 
-    /**
-     * Parses a large raw result string and splits it into substrings,
-     * each starting with "Result Number: X" and ending right before the next "Result Number: Y".
-     *
-     * @param rawResult The full multi-line string containing one or more result blocks.
-     * @return A list of individual result blocks.
-     */
-    private ArrayList<String> parseSearchResults(String rawResult) {
-        if (rawResult.isEmpty() ||rawResult.equals("No results found.")){
-            return new ArrayList<>();
-        }
-        ArrayList<String> blocks = new ArrayList<>();
-        
-        // Split on a lookahead for "Result Number: " followed by one or more digits.
-        // This means each substring will start with "Result Number: <digits>"
-        String[] splitBlocks = rawResult.split("(?=Result Number: \\d+)");
-
-        for (String block : splitBlocks) {
-            block = block.trim();
-            // Skip empty pieces (in case there's leading/trailing newlines)
-            if (!block.isEmpty()) {
-                blocks.add(block);
+    public void addIndexingResultsButtonHandler(){
+        searchBar.getIndexStatsButton().addActionListener(e -> {
+            if (!this.isShowingIndexingResults){
+                SwingUtilities.invokeLater(() -> {
+                    IndexingStatsGUI indexingUI = new IndexingStatsGUI(this.indexResults,this);
+                    indexingUI.setVisible(true);
+                });
             }
-        }
-        return blocks;
+        });
     }
 }
 
