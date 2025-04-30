@@ -108,11 +108,13 @@ flowchart TD
     MP["MyQueryParser (Custom parser that creates field-specific queries)"]
     LS["LuceneSearcher (Executes search using built query)"]
     R["Results (Extracts and formats key fields and best-match fragments)"]
-
+    RI["ResultItem"]
+    
     SM --> QM
+    SM --> LS
     QM --> MP
-    QM --> LS
     LS --> R
+    R --> RI
 ```
 ## 3 Shell Proctors
 
