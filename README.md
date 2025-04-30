@@ -33,7 +33,7 @@ javac -cp "jars/*:." src/*.java src/Indexers/*.java GUI/*/*.java raven/combobox/
 - ***missing*** boolean flag to only index missing documents (no value needed)
 
 > **Note:** 
-> The **parallel** and **batch** flags are mutually exclusive.
+> The **parallel** and **batch** flags are mutually exclusive. <br>
 > The **new**, **changed**, and **missing** flags are mutually exclusive.
 
 ```zsh
@@ -116,6 +116,8 @@ flowchart TD
 ```
 ## 3 Shell Proctors
 
+> **Note:** At some point throughout the process, the indexers would take a mysteriously long time to run. If you get this during runtime I suggest warming it up by running the parallel indexers first. After some time the JVM will start to use JIT compilation and the indexers will run much faster.
+
 **How to Run**
 ```zsh 
 # Make the scripts executable
@@ -129,18 +131,17 @@ To get the runtime benchmark data for the poster I ran the two scripts <code> `I
 
 <p>
 
-The scripts were ran on the gutenberg data and the cranfield data. As well as, from the terminal in vs code and from the mac terminal.
+The scripts were ran on the gutenberg data and the cranfield data. As well as, from the terminal in vs code and from the mac terminal with vscode closed.
 
-> **Note:** Since the time of the data collection I did modify the batch indexer to use a bigger batch for the cranfield data because I noticed that the batch indexer was taking slightly longer than the base parallel indexer for the cranfield data.
 <ul>
-    <li> **IndexExistsProctor.sh** - This script is used to get the data when running the indexing the files when the index already exists </li>
-    <li> **IndexDoesNotExistProctor.sh** - This script is used to get the data when running the indexing the files when the index does not exist </li>
+    <li> <code>IndexExistsProctor.sh</code> - This script is used to get the data when running the indexing the files when the index already exists </li>
+    <li> <code>IndexDoesNotExistProctor.sh</code> - This script is used to get the data when running the indexing the files when the index does not exist </li>
 </ul>
-<p>
+
 Both of the documents were ran for both the cranfield data and the gutenburg data.
 See **DataVisualization** for more plots and code.
 
-> **Note:** At some point throughout the process, the indexers would take a mysteriously long time to run. If you get this during runtime I suggest warming it up by running the parallel indexers first. After some time the JVM will start to use JIT compilation and the indexers will run much faster.
+> **Note:** Since the time of the data collection I did modify the batch indexer to use a bigger batch for the cranfield data because I noticed that the batch indexer was taking slightly longer than the base parallel indexer for the cranfield data.
 
 ### 3.1 Results
 ![image](DataVisualization/Combined_Boxplots.png)
