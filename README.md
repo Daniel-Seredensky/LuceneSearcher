@@ -45,7 +45,7 @@ java -cp "jars/*:." src.Main -kwarg1 value1 -kwarg2 value2
 ``` plaintext
 DataVisualization/               // Used for visualization of indexer data
 GUI/
-├── GUI.java                     // Main JFrame (**not implemented**)
+├── ComponentTest.java           // Helped with testing components
 │   Utilities/                   // Utility classes for GUI
 │   └── ScalingUtil.java         // Utility class for scaling components to get a basic version of Swifts dynamic geometry
 │   └── DrawingUtils.java        // Utility class for drawing shadows and hover effects
@@ -62,10 +62,11 @@ GUI/
 ├── GUIProgression/              // Progression classes for GUI
 │   ├── SearcherUI.java          // Handles the integration of the searcher handlers and the results layout
 │   ├── ComponentLayout.java     // Handles the default layout of the GUI
+│   ├── IndexingStatsGUI.java    // Page to display indexing stats
 │   └── BaseGUI.java             // Base abstract class for main JFrame handles setup
 jars/                            // External libraries 
 ├── **flatlaf jars**             // FlatLaf look and feel for GUI and for Raven Component
-├── **Lucene jars** 
+├── **Lucene jars**              // Relevant Lucene jars
 src/
 ├── Indexers/                    // Different types of indexers for results on poster
 │   ├── TextFileIndexer.java     // Base text file indexer
