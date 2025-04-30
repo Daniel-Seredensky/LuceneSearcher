@@ -35,8 +35,10 @@ public class Results {
     private List<ResultItem> items;
     private long totalHits;
     // Mandatory fields always included.
-    private static final Set<String> MANDATORY_FIELDS = Set.of("filename", "title", "author");
-
+    private static final Set<String> MANDATORY_FIELDS = Collections.unmodifiableSet(
+        new HashSet<>(Arrays.asList("filename", "title", "author"))
+    );
+    
     public Results() {
         this.items = new ArrayList<>();
     }
