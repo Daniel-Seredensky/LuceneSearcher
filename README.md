@@ -103,11 +103,11 @@ raven/combobox
 
 ```mermaid 
 flowchart TD
-    SM["SearchManager (Coordinates overall search logic)"]
+    SM["SearchManager"]
     QM["QueryManager"]
-    MP["MyQueryParser (Custom parser that creates field-specific queries)"]
-    LS["LuceneSearcher (Executes search using built query)"]
-    R["Results (Extracts and formats key fields and best-match fragments)"]
+    MP["MyQueryParser"]
+    LS["LuceneSearcher"]
+    R["Results"]
     RI["ResultItem"]
     
     SM --> QM
