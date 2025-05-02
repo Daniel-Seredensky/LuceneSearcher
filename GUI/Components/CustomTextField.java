@@ -16,12 +16,14 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
 /**
- * Custom text field with no border and matching background 
+ * Custom text field with no border and matching background<p>
+ * Used in {@link GUI.Components.SearchBar}, for the search text field and the number of results text field.
  */
 public class CustomTextField extends JTextField {
     private String prompt = "I don't know what you're looking for, but have fun";
     private final Color BACKGROUND_COLOR = Color.decode("#DDE0D4"); // FETA color
     private final Color FOREGROUND_COLOR = Color.decode("#262626"); // Dark gray
+    /** Constructs a custom text object*/
     public CustomTextField() {
         setText("");
         int paddingTop = ScalingUtil.scalePadding(10);
@@ -46,10 +48,12 @@ public class CustomTextField extends JTextField {
         });
     }
 
+    // Setters and getters for the prompt 
     public void setPrompt(String prompt) {
         this.prompt = prompt;
         repaint();
     }
+
     public String getPrompt() {
         return prompt;
     } 

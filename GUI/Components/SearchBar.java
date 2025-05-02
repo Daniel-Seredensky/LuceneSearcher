@@ -104,8 +104,6 @@ public class SearchBar extends JPanel {
         indexStatsButton = new ModernButton(MAX_BUTTON_WIDTH + ScalingUtil.scaleWidth(20), MAX_BUTTON_HEIGHT + ScalingUtil.scaleHeight(10), "Indexing Statistics");
         explainButton = new ModernButtonBoolean(MAX_BUTTON_WIDTH, MAX_BUTTON_HEIGHT, "Explain");
 
-        customizeInternalButtons();
-
         add(textField);
         add(searchButton);
         add(indexStatsButton);
@@ -270,14 +268,6 @@ public class SearchBar extends JPanel {
         explainButton.setPreferredSize(new Dimension(currentButtonWidth, currentButtonHeight));
     }
 
-    /**
-     * Customize internal buttons to match the panel's aesthetic
-     */
-    private void customizeInternalButtons() {
-        indexStatsButton.setBackground(BACKGROUND_COLOR);
-        explainButton.setBackground(BACKGROUND_COLOR);
-    }
-
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
@@ -328,6 +318,7 @@ public class SearchBar extends JPanel {
         return comboBox;
     }
 
+    /** Sets the data for the combo box */
     private void setData(JComboBox<String> combo) {
         combo.setModel(new javax.swing.DefaultComboBoxModel<String>(
             combineArrays(
@@ -338,6 +329,7 @@ public class SearchBar extends JPanel {
         );
     }
 
+    /** Combines two arrays into one */
     public static String[] combineArrays(String[] array1, String[] array2) {
         return Stream.concat(Arrays.stream(array1), Arrays.stream(array2))
                     .toArray(String[]::new);

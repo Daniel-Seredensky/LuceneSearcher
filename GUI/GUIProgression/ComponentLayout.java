@@ -3,8 +3,12 @@ package GUI.GUIProgression;
 import GUI.Components.SearchBar;
 import GUI.Utilities.ScalingUtil;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.Container;
 
 /**
  * Superclass that handles the default (non-results) layout.

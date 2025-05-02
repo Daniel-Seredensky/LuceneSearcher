@@ -10,6 +10,12 @@ import javax.swing.Timer;
 
 import src.ResultItem;
 
+/**
+ * The base class for the Result Card. In retrospect this class could have extended a result Item, but we are in too deep now. <p>
+ * The base card class gets the relevant data from the result item and stores them as instance variables. <p>
+ * It also contains the logic for the hover animation. <p>
+ * 
+ */
 public class BaseResultCard extends JPanel {
 
     // Fields taken from the ResultItem 

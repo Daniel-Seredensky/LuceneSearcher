@@ -15,7 +15,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 
 /**
- * Custom circular search button with shadow effect and hover states
+ * Custom circular search button with shadow effect and hover states <p>
+ * In retrospect I should have just used ModernButton, but I'm too lazy to change it now.
  */
 public class SearchButton extends JButton {
     private final int shadowSize = ScalingUtil.scalePadding(10);

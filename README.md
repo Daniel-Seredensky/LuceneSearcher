@@ -12,7 +12,9 @@
 
 ### 1.1 Compilation 
 
-- ***note*** I use zsh for my terminal
+> ***note*** Results may very depending on the computer's hardware. 
+> I use zsh, if you are on windows you may need to substitute `:` for `;`
+> Also, make sure you are using **git bash** and not powershell because wildcard syntax will not work.
 
 ```zsh
 # compiles the java files in the main dir, and the GUI files 
@@ -37,8 +39,10 @@ javac -cp "jars/*:." src/*.java src/Indexers/*.java GUI/*/*.java raven/combobox/
 > The **parallel** and **batch** flags are mutually exclusive. <p>
 > The **new**, **changed**, and **missing** flags are mutually exclusive.
 
+#### Example:
+> See note from ![1.1 Compilation](#11-compilation)
 ```zsh
-java -cp "jars/*:." src.Main -kwarg1 value1 -kwarg2 value2
+java -cp "jars/*:." src.Main -index indexData -data data -parallel 
 ```
 
 ## 2 File Structure
@@ -55,8 +59,7 @@ GUI/
 │   ├── SearchButton.java        // Search button component
 │   ├── CustomTextField.java     // Text field with custom styling to blend into the JPanel (SearchBar.java)
 │   ├── ModernButton.java        // Button designed to look like a SwiftUI rounded button
-│   ├── Menu.java                // Settings menu (**not implemented**)
-│   ├── Title.java               // Custom formatted title component (**not used**)
+│   ├── Title.java               // Custom formatted title component 
 │   ├── BaseResultCard.java      // Sets up the result card colors, hover animation, and parses the result text
 │   ├── ResultCard.java          // Handles the design of the result card, scrollable panel, and hover effects
 │   └── ResultsPanel.java        // Displays search results in a scrollable panel 

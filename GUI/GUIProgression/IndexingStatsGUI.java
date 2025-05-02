@@ -1,16 +1,23 @@
 package GUI.GUIProgression;
 
+import GUI.Components.ModernButton;
 import GUI.Components.Title;
 import GUI.Utilities.DrawingUtils;
 import GUI.Utilities.ScalingUtil;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.text.DecimalFormat;
-import GUI.GUIProgression.SearcherUI;
+
 import src.Indexers.TextFileIndexer.IndexingResult;
-import GUI.Components.ModernButton;
 
 /**
  * GUI for displaying Lucene indexing statistics.
@@ -30,6 +37,7 @@ public class IndexingStatsGUI extends BaseGUI {
      * Creates a new IndexingStatsGUI with the given indexing result.
      * 
      * @param result The indexing result to display
+     * @param caller The SearcherUI instance that opened this GUI
      */
     public IndexingStatsGUI(IndexingResult result, SearcherUI caller) {
         super("Lucene Indexing Statistics");
@@ -85,7 +93,7 @@ public class IndexingStatsGUI extends BaseGUI {
                     y += lineHeight;
                     DrawingUtils.drawTextWithShadow(g2d, "Elapsed Time:", leftMargin, y, statFont, 
                                                   textColor, shadowColor, textShadowOffset);
-                    DrawingUtils.drawTextWithShadow(g2d, timeFormat.format(result.elapsedTime) + " seconds", 
+                    DrawingUtils.drawTextWithShadow(g2d, timeFormat.format(result.elapsedTime) + " ms", 
                                                   leftMargin + labelValueGap, y, valueFont, 
                                                   textColor, shadowColor, valueShadowOffset);
                     g2d.dispose();

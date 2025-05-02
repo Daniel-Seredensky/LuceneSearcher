@@ -57,6 +57,9 @@ public class DrawingUtils {
     public static void drawTextWithShadow(Graphics2D g2d, String text, int x, int y, 
                                          Font font, Color textColor, Color shadowColor, int shadowSize) {
         g2d.setFont(font);
+        if (text.isEmpty()) {
+            return;
+        }
         
         // Draw shadow
         TextLayout textLayout = new TextLayout(text, font, g2d.getFontRenderContext());

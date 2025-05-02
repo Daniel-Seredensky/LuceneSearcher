@@ -160,7 +160,7 @@ public class Main {
         }
         
         if (launchGUI) {
-            final String indexPathFinal = indexPath;
+            final String indexPathFinal = indexPath; // Java wants indexPath and explan to be final
             final boolean explainFinal = explain;
             SwingUtilities.invokeLater(() -> {
                 SearcherUI ui = new SearcherUI("Lucene Searcher",indexPathFinal, explainFinal, maxResults,indexingResults);

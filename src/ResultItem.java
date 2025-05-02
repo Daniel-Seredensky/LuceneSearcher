@@ -8,7 +8,7 @@ public class ResultItem {
     private String filename;
     private String title;
     private String author;
-    private String output; // Formatted output string including mandatory fields and best fragment.
+    private String output; 
     private float score;
     private boolean hasExplanation;
     private String explanation;
@@ -16,6 +16,7 @@ public class ResultItem {
     private String bestFragment;
     private String bestField;
 
+    /** Constructor for a ResultItem with no explanation. */
     public ResultItem(String filename, String title, String author, String bestField, String bestFragment, String output, float score,int resultNumber) {
         this.filename = filename;
         this.title = title;
@@ -27,6 +28,7 @@ public class ResultItem {
         this.bestField = bestField;
     }
 
+    /** Constructor for a ResultItem with an explanation. */
     public ResultItem(String filename, String title, String author, String bestField, String bestFragment, String output, float score, int resultNumber, String explanation) {
         this.filename = filename;
         this.title = title;
@@ -39,6 +41,8 @@ public class ResultItem {
         this.bestFragment = bestFragment;
         this.bestField = bestField;
     }
+
+    // Getters and toString
 
     public String getBestFragment() {
         return bestFragment;

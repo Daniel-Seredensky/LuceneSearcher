@@ -1,15 +1,21 @@
 package GUI.GUIProgression;
 
-import src.SearchManager; 
-import GUI.Components.ResultsPanel;
 import GUI.Components.CustomTextField;
+import GUI.Components.ResultsPanel;
 import GUI.Utilities.ScalingUtil;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.util.ArrayList;
-import src.Results;
+
 import src.Indexers.TextFileIndexer.IndexingResult;
+import src.Results;
+import src.SearchManager;
 
 public class SearcherUI extends ComponentLayout {
 
@@ -132,7 +138,6 @@ public class SearcherUI extends ComponentLayout {
             ArrayList<Object> fields = new ArrayList<>(searchBar.getComboBox().getSelectedItems());
             boolean hasLiteralSearch = fields.contains("Literal Search");
             query = hasLiteralSearch ? "\"" + query + "\"" : query;
-            
 
             String finalQuery = "";
             // Add the fields to the query

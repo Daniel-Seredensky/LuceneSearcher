@@ -2,7 +2,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+
 def create_boxplot_by_type(ax, filepath, subplot_title):
+    """
+    Creates a boxplot for a csv file and adds it to the given axis.
+    Args: 
+        ax - axis to add the boxplot to
+        filepath - path to the csv file
+        subplot_title - title for the subplot
+    """
     try:
         df = pd.read_csv(filepath)
             
@@ -41,4 +49,3 @@ plt.tight_layout()
 
 plt.savefig("DataVisualization/Combined_BoxplotsUpdated.png")
 plt.close()
-
