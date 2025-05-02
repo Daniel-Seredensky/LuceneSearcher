@@ -11,12 +11,12 @@
 ## 1 How to run
 ``` mermaid
 flowchart TD
-    A[Compile code] --> B[Run with -CleanCranfield flag]
+    A[Compile code] --> B[Run with only -CleanCranfield flag]
     B --> C[cranfieldSeparated created]
     C --> D[Run full project]
     D --> E{Select data directory}
-    E -->|cranfieldSeparated| F[Use cranfieldSeparated]
-    E -->|data| G[Use data]
+    E -->|cranfieldSeparated| F[Run with -data cranfieldSeparated <other flags>]
+    E -->|data| G[Run with -data data <other flags>]
 ```
 
 ### 1.1 Compilation 
@@ -49,7 +49,7 @@ javac -cp "jars/*:." src/*.java src/Indexers/*.java GUI/*/*.java raven/combobox/
 > The **new**, **changed**, and **missing** flags are mutually exclusive.
 
 #### Example:
-> See note from ![1.1 Compilation](#11-compilation)
+> See note from 
 ```zsh
 java -cp "jars/*:." src.Main -index indexData -data data -parallel 
 ```
