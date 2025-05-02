@@ -94,8 +94,8 @@ src/
 ├── ResultItem.java              // Simple data structure to hold the results
 ├── Results.java                 // Parses topDocs and returns an array of ResultItems
 ├── SearchManager.java           // Coordinates overall search logic
-IndexExistsProctor.java          // see below |
-IndexNotExistsProctor.java       //           V
+IndexExistsProctor.sh            // see below |
+IndexNotExistsProctor.sh         //           V
 data/
 ├── *The Gutenburg data*   
 cranfield/
