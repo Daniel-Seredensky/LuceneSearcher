@@ -15,7 +15,6 @@ import org.apache.lucene.util.Bits;
 import src.Indexers.TextFileIndexer.DocumentInfo;
 import src.Indexers.TextFileIndexer.IndexingResult;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -211,9 +210,9 @@ public class TextFileIndexerParallel {
     }
     
     public static void main(String[] args) {
-        String indexDir = "indexCranfield";
-        String dataDir = "cranfieldSeparated";
-        boolean isGutenberg = false; 
+        String indexDir = "indexData";
+        String dataDir = "data";
+        boolean isGutenberg = true; 
         String mode = null;
         double time = TextFileIndexerParallel.run(dataDir,indexDir,mode,isGutenberg,false);
         System.out.println(""+time + "\n");

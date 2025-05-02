@@ -34,22 +34,22 @@ import java.nio.file.Files;
  */
 public final class TextIndexingHelper {
 
-    /** Shared analyzer instance (also used by the index writer configuration). */
+    /** Shared analyzer instance <p> <b>thread safe</b> */
     public static final ThreadLocal<StandardAnalyzer> THREAD_LOCAL_ANALYZER = ThreadLocal.withInitial(() -> new StandardAnalyzer());
 
     /** Cached, immutable stop‑word set pulled from <p{@link #ANALYZER}. */
     private static final ThreadLocal<CharArraySet> THREAD_LOCAL_STOP_WORDS = ThreadLocal.withInitial(() -> 
     THREAD_LOCAL_ANALYZER.get().getStopwordSet());
 
-    // Public method to get stop words from thread local
+    /** public accessor for the stop‑word set <p> <b>thread safe</b>*/
     public static CharArraySet getStopWords() {
         return THREAD_LOCAL_STOP_WORDS.get();
     }
 
-    public final static int BUFFER_SIZE = 65536; // 64 KB
+    public static final int BUFFER_SIZE = 65536; // 64 KB
 
-    private static final String GUTENBERG_START = "START OF THE PROJECT GUTENBERG EBOOK";
-    private static final String GUTENBERG_END   = "END OF THE PROJECT GUTENBERG EBOOK";
+    public static final String GUTENBERG_START = "START OF THE PROJECT GUTENBERG EBOOK";
+    public static final String GUTENBERG_END   = "END OF THE PROJECT GUTENBERG EBOOK";
 
     /**
      * Lower‑cases, stems (Porter) and recombines the input string.

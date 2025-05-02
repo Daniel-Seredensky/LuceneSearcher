@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
-CSV_FILE="CIndexExistsCL.csv"
-INDEX_DIR="indexCranfield"
+CSV_FILE="DataVisualization/GutIndexExistsVSUpdated.csv"
+INDEX_DIR="indexData"
 
 echo "Type,IndexingTime" > "$CSV_FILE"
 
@@ -16,20 +16,18 @@ run_and_record() {
       | grep -E '^[0-9]+' \
       | tail -n1
   )
-  echo "${TYPE},${TIME}" >> "$CSV_FILE"
-  
-  sleep 2  
+  echo "${TYPE},${TIME}" >> "$CSV_FILE"  
 }
 
-for i in {1..30}; do
+for i in {1..10}; do
   run_and_record default  src.Indexers.TextFileIndexer
 done
 
-for i in {1..30}; do
+for i in {1..10}; do
   run_and_record parallel src.Indexers.TextFileIndexerParallel
 done
 
-for i in {1..30}; do
+for i in {1..10}; do
   run_and_record batch src.Indexers.TextFileIndexerPBatch
 done
 

@@ -244,8 +244,8 @@ public class TextFileIndexerPBatch {
     }
 
     public static void main(String[] args) {
-        String indexDir = "indexCranfield";
-        String dataDir = "cranfieldSeparated";
+        String indexDir = "indexData";
+        String dataDir = "data";
         boolean isGutenberg = true; 
         String mode = null;
         double time = TextFileIndexerPBatch.run(dataDir,indexDir,mode,isGutenberg,false);

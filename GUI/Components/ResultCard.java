@@ -154,42 +154,65 @@ public class ResultCard extends BaseResultCard {
     }
     
     /**
+     * Adjusts font size based on string length.
+     * 
+     * @param baseFont The original font
+     * @param text The text to be displayed
+     * @return A font with adjusted size if the text is too long
+     */
+    private Font adjustFontForTextLength(Font baseFont, String text) {
+        int length = text.length();
+        int fontSize = baseFont.getSize();
+        
+        if (length > 40) {
+            fontSize -= ScalingUtil.scalePadding(8);
+        } else if (length > 20) {
+            fontSize -= ScalingUtil.scalePadding(5);
+        }
+
+        fontSize = Math.max(fontSize, ScalingUtil.scalePadding(5));
+        
+        return new Font(baseFont.getName(), baseFont.getStyle(), fontSize);
+    }
+
+    /**
      * Custom painting of the card content.
-     *
      * @param g the Graphics context
      */
     protected void paintCardContent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
-
+        
         // Enable anti-aliasing for smooth edges and text
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        
+        // Card background 
         int width = getWidth();
         int height = showDetails ? Math.max(getHeight(), calculateMinimumContentHeight()) : COLLAPSED_HEIGHT;
         width -= ScalingUtil.scalePadding(10);
         height -= ScalingUtil.scalePadding(10);
-
         int arc = ScalingUtil.scaleWidth(30);
         Shape cardShape = new RoundRectangle2D.Float(0, 0, width, height, arc, arc);
-
-        Color shadowColor = DrawingUtils.createShadowColor(100); 
+        Color shadowColor = DrawingUtils.createShadowColor(100);
         int shadowSize = ScalingUtil.scalePadding(10);
         DrawingUtils.drawShadow(g2, cardShape, shadowSize, shadowColor);
-
         Color backgroundColor = DrawingUtils.darkenColor(PUNGA, 0.4f);
-        backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), 
-                                    backgroundColor.getBlue(), 150); // Slight transparency
+        backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(),
+                backgroundColor.getBlue(), 150); 
         g2.setColor(backgroundColor);
         g2.fill(cardShape);
-
+        
+        // Card constants
         int padding = ScalingUtil.scalePadding(25);
-        Font titleFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleWidth(22));
-        Font normalFont = new Font("SansSerif", Font.PLAIN, ScalingUtil.scaleWidth(14));
+        Font baseTitleFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleWidth(22));
+        Font normalFont = new Font("SansSerif", Font.PLAIN, ScalingUtil.scaleWidth(12));
         Font circleFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleWidth(16));
+        Font titleFont = adjustFontForTextLength(baseTitleFont, title);
+        Font authorFont = adjustFontForTextLength(normalFont, author);
         Color textColor = FETA;
         int textShadowSize = ScalingUtil.scalePadding(8);
-
-        // Draw the result number inside a circle
+        
+        // Result number
         int circleSize = ScalingUtil.scaleWidth(40);
         int circleX = padding;
         int circleY = padding;
@@ -199,69 +222,67 @@ public class ResultCard extends BaseResultCard {
         String resultNumberStr = String.valueOf(resultNumber);
         int textWidth = g2.getFontMetrics(circleFont).stringWidth(resultNumberStr);
         int textHeight = g2.getFontMetrics(circleFont).getHeight();
-        g2.setColor(textColor);
-        g2.setFont(circleFont);
-        g2.drawString(resultNumberStr, circleX + (circleSize - textWidth) / 2, 
-                circleY + circleSize / 2 + textHeight / 4);
+        int numberX = circleX + (circleSize - textWidth) / 2;
+        int numberY = circleY + circleSize / 2 + textHeight / 4;
+        DrawingUtils.drawTextWithShadow(g2, resultNumberStr, numberX, numberY, 
+                                    circleFont, textColor, shadowColor, ScalingUtil.scalePadding(2));
 
-        // Draw centered title
-        g2.setFont(titleFont);
-        int titleWidth = g2.getFontMetrics().stringWidth(title);
+        // Title
+        int titleWidth = g2.getFontMetrics(titleFont).stringWidth(title);
         int titleX = (width - titleWidth) / 2;
         int titleY = padding + circleSize + ScalingUtil.scalePadding(25);
         DrawingUtils.drawTextWithShadow(g2, title, titleX, titleY, titleFont, textColor, shadowColor, textShadowSize);
-
-        // Draw author and filename inside ellipses
+        
+        // Ellipse constants
         int ellipseHeight = ScalingUtil.scaleHeight(30);
         int ellipseWidth = ScalingUtil.scaleWidth(150);
         int ellipseSpacing = ScalingUtil.scaleWidth(20);
         int ellipseY = titleY + ScalingUtil.scalePadding(25);
-
-        // Author ellipse and text
+        
+        // Author 
         int authorEllipseX = width / 2 - ellipseWidth - ellipseSpacing / 2;
-        Shape authorEllipse = new RoundRectangle2D.Float(authorEllipseX, ellipseY, 
+        Shape authorEllipse = new RoundRectangle2D.Float(authorEllipseX, ellipseY,
                 ellipseWidth, ellipseHeight, ellipseHeight, ellipseHeight);
+        DrawingUtils.drawShadow(g2, authorEllipse, ScalingUtil.scalePadding(3), shadowColor);
         g2.setColor(ACCENT_COLOR);
-        g2.fill(authorEllipse);
-        g2.setFont(normalFont);
-        g2.setColor(textColor);
-        int authorTextWidth = g2.getFontMetrics().stringWidth(author);
+        g2.fill(authorEllipse);        
+        int authorTextWidth = g2.getFontMetrics(authorFont).stringWidth(author);
         int authorTextX = authorEllipseX + (ellipseWidth - authorTextWidth) / 2;
-        int textVerticalCenter = ellipseY + ellipseHeight / 2 + g2.getFontMetrics().getHeight() / 4;
-        g2.drawString(author, authorTextX, textVerticalCenter);
-
-        // Filename ellipse and text
+        int textVerticalCenter = ellipseY + ellipseHeight / 2 + g2.getFontMetrics(authorFont).getHeight() / 4;
+        DrawingUtils.drawTextWithShadow(g2, author, authorTextX, textVerticalCenter, 
+                                    authorFont, textColor, shadowColor, ScalingUtil.scalePadding(2));
+        
+        // Filename 
         int filenameEllipseX = width / 2 + ellipseSpacing / 2;
-        Shape filenameEllipse = new RoundRectangle2D.Float(filenameEllipseX, ellipseY, 
+        Shape filenameEllipse = new RoundRectangle2D.Float(filenameEllipseX, ellipseY,
                 ellipseWidth, ellipseHeight, ellipseHeight, ellipseHeight);
+        DrawingUtils.drawShadow(g2, filenameEllipse, ScalingUtil.scalePadding(3), shadowColor);
         g2.setColor(ACCENT_COLOR);
         g2.fill(filenameEllipse);
-        g2.setColor(textColor);
-        String displayFilename = filename;
-        if (displayFilename.length() > 15) {
-            displayFilename = displayFilename.substring(0, 12) + "...";
-        }
-        int filenameTextWidth = g2.getFontMetrics().stringWidth(displayFilename);
+        int filenameTextWidth = g2.getFontMetrics(normalFont).stringWidth(filename);
         int filenameTextX = filenameEllipseX + (ellipseWidth - filenameTextWidth) / 2;
-        g2.drawString(displayFilename, filenameTextX, textVerticalCenter);
-
+        DrawingUtils.drawTextWithShadow(g2, filename, filenameTextX, textVerticalCenter, 
+                                    normalFont, textColor, shadowColor, ScalingUtil.scalePadding(2));
+        
         // Only show additional details when hovered/expanded
         if (showDetails) {
             int detailsY = ellipseY + ellipseHeight + ScalingUtil.scalePadding(25);
             DrawingUtils.drawTextWithShadow(g2, "Score: " + score, padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
             detailsY += normalFont.getSize() + padding;
-
+            
             // Render best fragment text if provided
             if (bestFragment != null && !bestFragment.isEmpty()) {
-                DrawingUtils.drawTextWithShadow(g2, "Best Fragment from " + bestFragmentField +":", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
+                DrawingUtils.drawTextWithShadow(g2, "Best Fragment from " + bestFragmentField + ":", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
                 detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
-
+                
                 String[] words = bestFragment.split("\\s+");
                 StringBuilder line = new StringBuilder();
                 int maxWidth = width - (padding * 2);
+                
                 for (String word : words) {
                     String testLine = line.toString() + (line.length() > 0 ? " " : "") + word;
                     int testWidth = g2.getFontMetrics(normalFont).stringWidth(testLine);
+                    
                     if (testWidth > maxWidth) {
                         DrawingUtils.drawTextWithShadow(g2, line.toString(), padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
                         detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
@@ -273,16 +294,18 @@ public class ResultCard extends BaseResultCard {
                         line.append(word);
                     }
                 }
+                
                 if (line.length() > 0) {
                     DrawingUtils.drawTextWithShadow(g2, line.toString(), padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
                     detailsY += normalFont.getSize() + padding;
                 }
             }
-
+            
             // Render full explanation (if available)
             if (hasExplanation && !fullExplanation.isEmpty()) {
                 DrawingUtils.drawTextWithShadow(g2, "Full Explanation:", padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
                 detailsY += normalFont.getSize() + ScalingUtil.scalePadding(5);
+                
                 String[] explanationLines = fullExplanation.split("\n");
                 for (String line : explanationLines) {
                     DrawingUtils.drawTextWithShadow(g2, line, padding, detailsY, normalFont, textColor, shadowColor, textShadowSize);
@@ -292,6 +315,8 @@ public class ResultCard extends BaseResultCard {
         }
         g2.dispose();
     }
+
+
     /**
      * Override the paint component to handle background and scrolling
      */

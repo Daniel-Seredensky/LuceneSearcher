@@ -250,9 +250,9 @@ public class TextFileIndexer {
     }
     
     public static void main(String[] args) {
-        String indexDir = "indexCranfield";
-        String dataDir = "cranfieldSeparated";
-        boolean isGutenberg = false; 
+        String indexDir = "indexData";
+        String dataDir = "data";
+        boolean isGutenberg = true; 
         String mode = null;
         double time = TextFileIndexer.run(dataDir,indexDir,mode,isGutenberg,false);
         System.out.println(""+time + "\n");

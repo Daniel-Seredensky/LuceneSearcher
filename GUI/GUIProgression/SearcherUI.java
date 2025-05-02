@@ -61,7 +61,7 @@ public class SearcherUI extends ComponentLayout {
             mainPanel.setOpaque(false);
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-            // If there are current results, either create a new ResultsPanel or update the existing one
+            // If there are no current results, create a new ResultsPanel else update the existing one
             if (resultsPanel == null) {
                 resultsPanel = new ResultsPanel(results);
             } else {
@@ -92,12 +92,12 @@ public class SearcherUI extends ComponentLayout {
     }
 
     /**
-     * Attaches a handler to the search button. When pressed:
-     * 1) Reads the text field for the query,
-     * 2) Runs the search via SearchManager,
-     * 3) Saves the results,
-     * 4) Flags that we have results to show,
-     * 5) Relayouts and repaints.
+     * Attaches a handler to the search button. When pressed:<p>
+     * 1) Reads the text field for the query,<p>
+     * 2) Runs the search via SearchManager,<p>
+     * 3) Saves the results,<p>
+     * 4) Flags that we have results to show,<p>
+     * 5) Relayouts and repaints.<p>
      */
     public void addSearchButtonHandler() {
         searchBar.getSearchButton().addActionListener(e -> {
@@ -181,4 +181,3 @@ public class SearcherUI extends ComponentLayout {
         });
     }
 }
-

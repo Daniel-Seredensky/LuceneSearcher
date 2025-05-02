@@ -35,8 +35,8 @@ public class BaseResultCard extends JPanel {
     protected int targetHeight = COLLAPSED_HEIGHT;
     protected int currentHeight = COLLAPSED_HEIGHT;
     protected Timer animationTimer;
-    protected final int ANIMATION_DURATION = 500; // milliseconds
-    protected final int ANIMATION_STEPS = 50;
+    protected final int ANIMATION_DURATION = 250; // milliseconds
+    protected final int ANIMATION_STEPS = 25;
     protected int animationStep = 0;
     protected Dimension originalSize = new Dimension(ScalingUtil.scaleWidth(1000), COLLAPSED_HEIGHT);
 
@@ -128,7 +128,6 @@ public class BaseResultCard extends JPanel {
      * @param resultItem the data structure containing the relevant result data
      */
     protected void parseResultFields(ResultItem resultItem) {
-        // Extract data directly from the ResultItem object using its getter methods
         this.hasExplanation = resultItem.hasExplanation();
         this.resultNumber = resultItem.getResultNumber();
         this.filename = resultItem.getFilename();

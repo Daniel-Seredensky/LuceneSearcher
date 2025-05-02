@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-CSV_FILE="CIndexNotExistsVS.csv"
+CSV_FILE="DataVisualization/CIndexNotExistsCLUpdated.csv"
 INDEX_DIR="indexCranfield" 
 
 echo "Type,IndexingTime" > "$CSV_FILE"
@@ -10,7 +10,7 @@ run_and_record() {
   local TYPE=$1
   local CLASS=$2
 
-  rm -rf "${INDEX_DIR:?}/"*
+  rm -rf "${INDEX_DIR}/"*
 
   local TIME
   TIME=$(
@@ -21,18 +21,18 @@ run_and_record() {
 
   echo "${TYPE},${TIME}" >> "$CSV_FILE"
   
-  sleep 2 
+  sleep 1 
 }
 
-for i in {1..25}; do
+for i in {1..10}; do
   run_and_record default src.Indexers.TextFileIndexer
 done
 
-for i in {1..25}; do
+for i in {1..10}; do
   run_and_record parallel src.Indexers.TextFileIndexerParallel
 done
 
-for i in {1..25}; do
+for i in {1..10}; do
   run_and_record batch src.Indexers.TextFileIndexerPBatch
 done
 

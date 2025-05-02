@@ -3,10 +3,6 @@ import matplotlib.pyplot as plt
 import os
 
 def create_boxplot_by_type(ax, filepath, subplot_title):
-    if not os.path.exists(filepath):
-        print(f"File not found: {filepath}")
-        return False
-    
     try:
         df = pd.read_csv(filepath)
             
@@ -17,7 +13,7 @@ def create_boxplot_by_type(ax, filepath, subplot_title):
             data_by_type.append(group['IndexingTime'])
             type_labels.append(type_name)
         
-        ax.boxplot(data_by_type, labels=type_labels, notch=True)
+        ax.boxplot(data_by_type, tick_labels=type_labels, notch=True)
         ax.set_ylabel("Indexing Time (ms)")
         ax.set_title(subplot_title)
         ax.grid(axis='y', linestyle='--', alpha=0.7)
@@ -26,13 +22,11 @@ def create_boxplot_by_type(ax, filepath, subplot_title):
         print(f"Error processing {filepath}: {e}")
 
 csv_files = [
-    "DataVisualization/GutIndexNotExistsCL.csv",    "DataVisualization/GutIndexNotExistsVS.csv",
-    "DataVisualization/GutIndexExistsCL.csv",    "DataVisualization/GutIndexExistsVS.csv",
-    "DataVisualization/CIndexExistsCL.csv", "DataVisualization/CIndexExistsVS.csv",
-    "DataVisualization/CIndexNotExistsCL.csv", "DataVisualization/CIndexNotExistsVS.csv",
+    "DataVisualization/CIndexNotExistsCLUpdated.csv",    "DataVisualization/CIndexNotExistsVSUpdated.csv",
+    "DataVisualization/CIndexExistsCLUpdated.csv",    "DataVisualization/CIndexExistsVSUpdated.csv",
 ]
 
-fig, axes = plt.subplots(4, 2, figsize=(16, 20))
+fig, axes = plt.subplots(2, 2, figsize=(16, 20))
 axes = axes.flatten()  
 
 for i, csv_file in enumerate(csv_files):
@@ -45,6 +39,6 @@ for i, csv_file in enumerate(csv_files):
 
 plt.tight_layout()
 
-plt.savefig("DataVisualization/Combined_Boxplots.png")
+plt.savefig("DataVisualization/Combined_BoxplotsUpdated.png")
 plt.close()
 

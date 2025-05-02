@@ -2,12 +2,15 @@ package GUI.GUIProgression;
 
 import GUI.Components.Title;
 import GUI.Utilities.DrawingUtils;
+import GUI.Utilities.ScalingUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import GUI.GUIProgression.SearcherUI;
 import src.Indexers.TextFileIndexer.IndexingResult;
+import GUI.Components.ModernButton;
 
 /**
  * GUI for displaying Lucene indexing statistics.
@@ -20,11 +23,9 @@ public class IndexingStatsGUI extends BaseGUI {
     private JPanel buttonPanel;
     private JButton closeButton;
     private SearcherUI caller;
-    
-    private final DecimalFormat timeFormat = new DecimalFormat("#0.000");
-    
     private IndexingResult result;
-    
+    private final DecimalFormat timeFormat = new DecimalFormat("#0.000");
+        
     /**
      * Creates a new IndexingStatsGUI with the given indexing result.
      * 
@@ -35,7 +36,6 @@ public class IndexingStatsGUI extends BaseGUI {
         this.caller = caller;
         this.caller.setShowingIndexingResults(true);
         this.result = result;
-        updateStats();
     }
     
     @Override
@@ -52,94 +52,80 @@ public class IndexingStatsGUI extends BaseGUI {
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                     
-                    Font statFont = new Font("SansSerif", Font.BOLD, 18);
-                    Font valueFont = new Font("SansSerif", Font.PLAIN, 24);
+                    Font statFont = new Font("SansSerif", Font.BOLD, ScalingUtil.scaleHeight(18));
+                    Font valueFont = new Font("SansSerif", Font.PLAIN, ScalingUtil.scaleHeight(24));
                     Color textColor = Color.decode("#DDE0D4");
                     Color shadowColor = new Color(0, 0, 0, 50);
                     
-                    int y = 50;
-                    int leftMargin = 50;
-                    int lineHeight = 40;
+                    int y = ScalingUtil.scaleHeight(50);
+                    int leftMargin = ScalingUtil.scaleWidth(50);
+                    int lineHeight = ScalingUtil.scaleHeight(40);
+                    int labelValueGap = ScalingUtil.scaleWidth(250);
+                    
+                    int textShadowOffset = ScalingUtil.scalePadding(3);
+                    int valueShadowOffset = ScalingUtil.scalePadding(4);
                     
                     DrawingUtils.drawTextWithShadow(g2d, "Documents Added:", leftMargin, y, statFont, 
-                                                  textColor, shadowColor, 3);
-                    DrawingUtils.drawTextWithShadow(g2d, String.valueOf(result.added), leftMargin + 250, y, valueFont, 
-                                                  textColor, shadowColor, 4);
+                                                  textColor, shadowColor, textShadowOffset);
+                    DrawingUtils.drawTextWithShadow(g2d, String.valueOf(result.added), leftMargin + labelValueGap, y, valueFont, 
+                                                  textColor, shadowColor, valueShadowOffset);
                     
                     y += lineHeight;
                     DrawingUtils.drawTextWithShadow(g2d, "Documents Changed:", leftMargin, y, statFont, 
-                                                  textColor, shadowColor, 3);
-                    DrawingUtils.drawTextWithShadow(g2d, String.valueOf(result.changed), leftMargin + 250, y, valueFont, 
-                                                  textColor, shadowColor, 4);
+                                                  textColor, shadowColor, textShadowOffset);
+                    DrawingUtils.drawTextWithShadow(g2d, String.valueOf(result.changed), leftMargin + labelValueGap, y, valueFont, 
+                                                  textColor, shadowColor, valueShadowOffset);
                 
                     y += lineHeight;
                     DrawingUtils.drawTextWithShadow(g2d, "Documents Removed:", leftMargin, y, statFont, 
-                                                  textColor, shadowColor, 3);
-                    DrawingUtils.drawTextWithShadow(g2d, String.valueOf(result.removed), leftMargin + 250, y, valueFont, 
-                                                  textColor, shadowColor, 4);
+                                                  textColor, shadowColor, textShadowOffset);
+                    DrawingUtils.drawTextWithShadow(g2d, String.valueOf(result.removed), leftMargin + labelValueGap, y, valueFont, 
+                                                  textColor, shadowColor, valueShadowOffset);
                     
                     y += lineHeight;
                     DrawingUtils.drawTextWithShadow(g2d, "Elapsed Time:", leftMargin, y, statFont, 
-                                                  textColor, shadowColor, 3);
+                                                  textColor, shadowColor, textShadowOffset);
                     DrawingUtils.drawTextWithShadow(g2d, timeFormat.format(result.elapsedTime) + " seconds", 
-                                                  leftMargin + 250, y, valueFont, 
-                                                  textColor, shadowColor, 4);
-                    
+                                                  leftMargin + labelValueGap, y, valueFont, 
+                                                  textColor, shadowColor, valueShadowOffset);
                     g2d.dispose();
                 }
             }
         };
         statsPanel.setOpaque(false);
-        statsPanel.setPreferredSize(new Dimension(600, 200));
+        statsPanel.setPreferredSize(ScalingUtil.scaleDimension(650, 425));
         
         buttonPanel = new JPanel();
         buttonPanel.setOpaque(false);
         
-        closeButton = new JButton("Close");
+        closeButton = new ModernButton(ScalingUtil.scaleWidth(120), ScalingUtil.scaleHeight(40), "Close");
         closeButton.addActionListener(e -> {
-            this.caller.setShowingIndexingResults(false);
+            this.caller.setShowingIndexingResults(false); // makes the button no longer usable 
             dispose();
         });
+        
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(
+            ScalingUtil.scalePadding(10), 
+            ScalingUtil.scalePadding(10), 
+            ScalingUtil.scalePadding(10), 
+            ScalingUtil.scalePadding(10)
+        ));
+        
         buttonPanel.add(closeButton);
     }
     
     @Override
     protected void layoutComponents() {
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(
+            ScalingUtil.scalePadding(5), 
+            ScalingUtil.scalePadding(5)
+        ));
         
         add(titleComponent, BorderLayout.NORTH);
-        
         add(statsPanel, BorderLayout.CENTER);
-        
         add(buttonPanel, BorderLayout.SOUTH);
+        
+        setSize(ScalingUtil.scaleDimension(650, 425));
+        setLocationRelativeTo(null); // Center on screen
     }
-    
-    /**
-     * Updates the statistics display with new data.
-     */
-    public void updateStats() {
-        if (statsPanel != null) {
-            statsPanel.repaint();
-        }
-    }
-    
-    /**
-     * Updates the indexing result and refreshes the display.
-     * 
-     * @param result The new indexing result
-     */
-    public void setIndexingResult(IndexingResult result) {
-        this.result = result;
-        updateStats();
-    }
-    
-    /**
-     * Adds a listener to the close button.
-     * 
-     * @param listener The action listener to add
-     */
-    public void addCloseButtonListener(ActionListener listener) {
-        closeButton.addActionListener(listener);
-    }
-    
 }

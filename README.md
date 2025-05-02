@@ -21,7 +21,7 @@ javac -cp "jars/*:." src/*.java src/Indexers/*.java GUI/*/*.java raven/combobox/
 
 ### 1.2 Run 
 
-#### 1.2.1 **KWARGS**
+#### **KWARGS**
 - ***explain*** boolean flag for the lucene explanation to be shown in the result (no value needed)
 - ***text*** boolean flag for the CLI to be shown instead of the GUI (no value needed) 
 - ***index*** String for the specific index directory to be used
@@ -31,9 +31,10 @@ javac -cp "jars/*:." src/*.java src/Indexers/*.java GUI/*/*.java raven/combobox/
 - ***new*** boolean flag to only index new documents (no value needed)
 - ***changed*** boolean flag to only index changed documents (no value needed)
 - ***missing*** boolean flag to only index missing documents (no value needed)
+- ***CleanCranfield*** boolean flag to clean the cranfield data, after cleaning the program returns early (no value needed)
 
 > **Note:** 
-> The **parallel** and **batch** flags are mutually exclusive. <br>
+> The **parallel** and **batch** flags are mutually exclusive. <p>
 > The **new**, **changed**, and **missing** flags are mutually exclusive.
 
 ```zsh
@@ -144,7 +145,9 @@ The scripts were ran on the gutenberg data and the cranfield data. As well as, f
 Both of the documents were ran for both the cranfield data and the gutenburg data.
 See **DataVisualization** for more plots and code.
 
-> **Note:** Since the time of the data collection I did modify the batch indexer to use a bigger batch for the cranfield data because I noticed that the batch indexer was taking slightly longer than the base parallel indexer for the cranfield data.
+> **Note:** Since the time of the data collection I did modify the indexers slightly to improve performance. Small fine tuning change such as batch size, etc.
 
 ### 3.1 Results
 ![image](DataVisualization/Combined_Boxplots.png)
+### 3.2 Updated Results
+![image](DataVisualization/Combined_Boxplots_Updated.png)
