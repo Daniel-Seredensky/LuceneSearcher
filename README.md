@@ -150,4 +150,4 @@ See **DataVisualization** for more plots and code.
 ### 3.1 Results
 ![image](DataVisualization/Combined_Boxplots.png)
 ### 3.2 Updated Results
-![image](DataVisualization/Combined_Boxplots_Updated.png)
+![image](DataVisualization/Combined_BoxplotsUpdated.png)
