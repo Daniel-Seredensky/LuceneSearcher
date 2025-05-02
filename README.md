@@ -9,6 +9,15 @@
 - *cranfieldSeparated* directory contains the cranfield data separated into individual files
 
 ## 1 How to run
+``` mermaid
+flowchart TD
+    A[Compile code] --> B[Run with -CleanCranfield flag]
+    B --> C[cranfieldSeparated created]
+    C --> D[Run full project]
+    D --> E{Select data directory}
+    E -->|cranfieldSeparated| F[Use cranfieldSeparated]
+    E -->|data| G[Use data]
+```
 
 ### 1.1 Compilation 
 
@@ -121,6 +130,7 @@ flowchart TD
     LS --> R
     R --> RI
 ```
+
 ## 3 Shell Proctors
 
 > **Note:** At some point throughout the process, the indexers would take a mysteriously long time to run. If you get this during runtime I suggest warming it up by running the parallel indexers first. After some time the JVM will start to use JIT compilation and the indexers will run much faster.

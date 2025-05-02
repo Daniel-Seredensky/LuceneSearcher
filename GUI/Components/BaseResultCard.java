@@ -150,5 +150,5 @@ public class BaseResultCard extends JPanel {
             this.fullExplanation = "";
         }
     }
-
+    
 }
