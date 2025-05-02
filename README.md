@@ -21,8 +21,8 @@ flowchart TD
 
 ### 1.1 Compilation 
 
-> ***note*** Results may very depending on the computer's hardware. 
-> I use zsh, if you are on windows you may need to substitute `:` for `;`
+> ***note*** Results may very depending on the computer's hardware and shell. 
+> I use zsh on mac, if you are on windows you may need to substitute `:` for `;`
 > Also, make sure you are using **git bash** and not powershell because wildcard syntax will not work.
 
 ```zsh
